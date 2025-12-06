@@ -73,7 +73,7 @@ function App() {
         <Route path="/dpa" element={<Suspense fallback={<div className='p-6'>Loading…</div>}><DataProcessingAgreement /></Suspense>} />
         {/* Protected Settings */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/settings" element={<Suspense fallback={<div className='p-6'>Loading…</div>}><AccountSettings /></Suspense>} />
+          <Route path="/account" element={<Suspense fallback={<div className='p-6'>Loading…</div>}><AccountSettings /></Suspense>} />
         </Route>
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminRoute><Suspense fallback={<div className='p-6'>Loading…</div>}><AdminDashboard /></Suspense></AdminRoute>} />

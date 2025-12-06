@@ -78,6 +78,7 @@ function EssayFeedback() {
   const [content, setContent] = useState('');
   const [rubricId, setRubricId] = useState<string>('');
   const [studentId, setStudentId] = useState<string>('');
+    const [customPrompt, setCustomPrompt] = useState<string>('Please provide detailed, constructive feedback for this essay based on the rubric criteria.');
   const { data: rubrics = [], isLoading: rubricsLoading } = useTeacherRubrics();
   const { data: students = [], isLoading: studentsLoading } = useTeacherStudents();
   const [bandAnalysis, setBandAnalysis] = useState<any>(null);
@@ -600,6 +601,20 @@ function EssayFeedback() {
           </div>
         ) : (
         <>
+        {/* Custom Feedback Prompt */}
+        <div className="mb-6">
+          <label htmlFor="custom-prompt" className="block font-semibold text-gray-700 mb-2">
+            Customize AI Feedback Prompt
+          </label>
+          <textarea
+            id="custom-prompt"
+            className="border border-gray-300 p-3 w-full h-20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+            value={customPrompt}
+            onChange={e => setCustomPrompt(e.target.value)}
+            placeholder="Enter your custom feedback prompt here..."
+          />
+          <p className="text-xs text-gray-500 mt-1">This prompt will be sent to the AI when generating feedback. You can tailor it to your subject, rubric, or teaching style.</p>
+        </div>
         {/* Essay Title */}
         <div className="mb-6">
           <label htmlFor="essay-title" className="block font-semibold text-gray-700 mb-2">
@@ -710,13 +725,13 @@ function EssayFeedback() {
             disabled={uploading}
             className="flex items-center justify-center gap-2 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {uploading && uploadProgress > 0 ? (
+                    feedbackText = await generateFeedbackViaEdgeFunction(content, rubricCriteria, customPrompt);
               <>
                 <span className="animate-spin">⚡</span>
                 <span>Processing ({uploadProgress}%)</span>
               </>
             ) : uploading ? (
-              <>
+                    feedbackText = await generateEssayFeedback(content, rubricCriteria, examBoard, customPrompt);
                 <span className="animate-spin">⚡</span>
                 <span>Uploading...</span>
               </>

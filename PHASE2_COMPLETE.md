@@ -54,7 +54,7 @@
 **Features:**
 - Automatic CSV formatting
 - Proper escaping for commas and quotes
-- Timestamps in readable format
+# Phase 2 Enhancements - Complete
 - Summary rows where applicable
 - Download triggers automatically
 
@@ -62,68 +62,32 @@
 - AdminUsers page - "Export CSV" button (top right)
 - AdminActivityLogs page - "Export CSV" button (top right)
 
-**CSV Formats:**
-
 **Users Export:**
 ```csv
 User ID,Email,Full Name,Is Admin,Essays Created,Rubrics Created,Students Managed,Created At
-```
-
 **Activity Logs Export:**
 ```csv
 Log ID,Timestamp,User Email,User Name,Action Type,Action Details,IP Address
-```
-
-**Platform Stats Export:**
-```csv
 Metric,Value
 Total Users,123
 New Users (30 days),45
-...
-```
-
-**API Usage Export:**
-```csv
-Essay ID,Title,Word Count,Teacher Email,Created At,Estimated Cost
 abc-123,Essay Title,500,teacher@school.com,2025-11-20 14:30,$0.0020
 TOTAL,250 essays,125000,,,,$0.50
 ```
-
----
-
-## 🔧 Setup Instructions
-
-### Step 1: Run Activity Logs Migration
-
-1. Go to Supabase SQL Editor
 2. Copy contents of `supabase/activity-logs.sql`
 3. Run the query
 4. Verify tables created:
-   - `activity_logs`
    - `admin_recent_activity` view
-
 ### Step 2: Test Activity Logging
 
 1. Login to your app (should auto-log)
 2. Create an essay (auto-logged via trigger)
 3. Go to `/admin/activity` to see logs
-4. Click "Export CSV" to download
-
-### Step 3: Use Exports
-
-**From Admin Users Page:**
 ```
 /admin/users → Click "Export CSV" → Download users-export-YYYY-MM-DD.csv
 ```
 
-**From Activity Logs Page:**
-```
-/admin/activity → Filter logs → Click "Export CSV" → Download activity-logs-YYYY-MM-DD.csv
-```
-
 ---
-
-## 📊 Usage Examples
 
 ### Manual Activity Logging
 
@@ -157,7 +121,6 @@ const customData = [
 exportToCSV(customData, 'student-scores.csv');
 ```
 
----
 
 ## 🚀 What's Next (Optional Phase 3)
 
@@ -191,7 +154,6 @@ exportToCSV(customData, 'student-scores.csv');
 - ✅ Automatic logging via database triggers
 
 **Exports:**
-- ✅ CSV files downloaded client-side (no server storage)
 - ✅ Only admins can export platform-wide data
 - ✅ Filenames include dates for organization
 - ✅ Proper data escaping prevents injection
@@ -227,7 +189,6 @@ exportToCSV(customData, 'student-scores.csv');
 4. Verify RLS policies allow access
 
 **Problem:** Export downloads empty CSV
-
 **Solution:**
 1. Ensure data exists before exporting
 2. Check browser console for errors

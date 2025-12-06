@@ -1,191 +1,28 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useTheme } from '../contexts/ThemeContext';
-import { useState } from 'react';
-import Logo from './Logo';
 
 function Navbar() {
-  const { profile, signOut } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await signOut();
     navigate('/auth');
-  };
-
-  const linkBase = 'relative px-1 py-0.5 transition-colors';
-  const desktopLink = (to: string, extra = '') => {
-    const active = location.pathname === to;
-    return `${linkBase} ${active ? 'text-brand-700 dark:text-brand-300 font-semibold after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-full after:rounded after:bg-accent-500' : 'text-gray-700 dark:text-gray-300 hover:text-brand-600 dark:hover:text-brand-400'} ${extra}`;
-  };
-  return (
-    <nav className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 mb-6 sticky top-0 z-40 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 py-3">
-        {/* Mobile and Desktop Header */}
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/dashboard" className="hover:opacity-90" aria-label="Simple RubriQ Home">
-            <Logo className="h-8 sm:h-10 transition-transform hover:scale-105" />
-          </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-6">
-            <Link to="/dashboard" className={desktopLink('/dashboard')}>Dashboard</Link>
-            <Link to="/rubrics" className={desktopLink('/rubrics')}>Rubrics</Link>
-            <Link to="/students" className={desktopLink('/students')}>Students</Link>
-            <Link to="/essay-feedback" className={desktopLink('/essay-feedback')}>Essay Feedback</Link>
-            <Link to="/analytics" className={desktopLink('/analytics')}>Analytics</Link>
-            <Link to="/batch" className={desktopLink('/batch')}>Batch</Link>
-            <Link to="/calibration" className={desktopLink('/calibration')}>Calibration</Link>
-            {profile?.is_admin && (
-              <Link to="/admin" className={desktopLink('/admin','text-orange-600 dark:text-orange-400')}>Admin</Link>
-            )}
-          </div>
-
-          {/* Desktop Right Side */}
-          <div className="hidden lg:flex items-center space-x-4">
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              aria-label="Toggle dark mode"
-              title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
-            >
-              {theme === 'light' ? (
-                <svg className="w-5 h-5 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-              ) : (
-                <svg className="w-5 h-5 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              )}
-            </button>
-            <Link 
-              to="/settings" 
-              className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 text-sm font-medium"
-            >
-              Settings
-            </Link>
-            <button onClick={handleLogout} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition-colors">
-              Logout
-            </button>
-          </div>
-
-          {/* Mobile Right Side - Hamburger + Theme Toggle */}
-          <div className="lg:hidden flex items-center space-x-2">
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              aria-label="Toggle dark mode"
-            >
-              {theme === 'light' ? (
-                <svg className="w-5 h-5 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-              ) : (
-                <svg className="w-5 h-5 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              )}
-            </button>
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              aria-label="Toggle menu"
-            >
-              <svg className="w-6 h-6 text-gray-700 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                {mobileMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
-          </div>
+  };  return (
+    <nav className="bg-white shadow mb-6">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">        <div className="flex items-center space-x-6">
+          <Link to="/dashboard" className="font-bold text-lg text-blue-700 hover:text-blue-900">MarkMate</Link>
+          <Link to="/dashboard" className="text-gray-700 hover:text-blue-600">Dashboard</Link>
+          <Link to="/rubrics" className="text-gray-700 hover:text-blue-600">Rubrics</Link>
+          <Link to="/students" className="text-gray-700 hover:text-blue-600">Students</Link>
+          <Link to="/essay-feedback" className="text-gray-700 hover:text-blue-600">Essay Feedback</Link>
+          <Link to="/analytics" className="text-gray-700 hover:text-blue-600">Analytics</Link>
+          <Link to="/batch" className="text-gray-700 hover:text-blue-600">Batch</Link>
         </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden mt-4 pb-2 space-y-2">
-            <Link 
-              to="/dashboard" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-            >
-              Dashboard
-            </Link>
-            <Link 
-              to="/rubrics" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-            >
-              Rubrics
-            </Link>
-            <Link 
-              to="/students" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-            >
-              Students
-            </Link>
-            <Link 
-              to="/essay-feedback" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-            >
-              Essay Feedback
-            </Link>
-            <Link 
-              to="/analytics" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-            >
-              Analytics
-            </Link>
-            <Link 
-              to="/batch" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-            >
-              Batch
-            </Link>
-            <Link 
-              to="/calibration" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-            >
-              Calibration
-            </Link>
-            {profile?.is_admin && (
-              <Link 
-                to="/admin" 
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-4 py-2 text-orange-600 dark:text-orange-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium"
-              >
-                Admin Portal
-              </Link>
-            )}
-            <Link 
-              to="/settings" 
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-            >
-              Settings
-            </Link>
-            <button 
-              onClick={() => {
-                setMobileMenuOpen(false);
-                handleLogout();
-              }}
-              className="w-full text-left px-4 py-2 text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors font-medium"
-            >
-              Logout
-            </button>
-          </div>
-        )}
+        <div className="flex items-center space-x-4">
+          {user && <span className="text-sm text-gray-500">{user.email}</span>}
+          <button onClick={handleLogout} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Logout</button>
+        </div>
       </div>
     </nav>
   );

@@ -15,6 +15,7 @@ interface AuthContextValue {
   profile: Profile | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -208,6 +209,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  const refreshProfile = async () => {
+    if (!user) return;
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id, email, full_name, is_admin, created_at, updated_at')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (data) {
+        const adminEmailsRaw = (import.meta.env.VITE_ADMIN_EMAILS || '').trim();
+        const adminEmailSet = new Set(
+          adminEmailsRaw.length ? adminEmailsRaw.split(',').map((e: string) => e.trim().toLowerCase()).filter(Boolean) : []
+        );
+        const isOverride = user.email && adminEmailSet.has(user.email.toLowerCase());
+
+        if (isOverride && !data.is_admin) {
+          setProfile({ ...data, is_admin: true });
+        } else {
+          setProfile(data);
+        }
+      }
+    } catch (error) {
+      console.error('[AuthContext] Error refreshing profile:', error);
+    }
+  };
+
   const signOut = async () => {
     try {
       console.log('[AuthContext] Signing out...');
@@ -226,7 +254,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const value: AuthContextValue = { user, profile, loading, signOut };
+  const value: AuthContextValue = { user, profile, loading, signOut, refreshProfile };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

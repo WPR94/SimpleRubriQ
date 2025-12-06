@@ -44,6 +44,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
 ${customPrompt ? `TEACHER INSTRUCTION: ${customPrompt}\n` : ''}
 
+🛡️ SAFEGUARDING PROTOCOL:
+If the student's work contains explicit mentions or strong indicators of self-harm, abuse, severe violence, or radicalization:
+1. Start your response with "⚠️ SAFEGUARDING ALERT: This work contains concerning themes. Please review in accordance with your school's safeguarding policy."
+2. Proceed with the academic assessment as normal, but maintain a neutral, professional tone.
+
 📋 YOUR TASK:
 1. Assess against GCSE Assessment Objectives (AO1-AO4 where applicable)
 2. Assign band levels (1=emerging, 2-3=developing, 4-5=secure, 6=exceptional)

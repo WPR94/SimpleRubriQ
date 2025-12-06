@@ -1,34 +1,195 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Logo from './Logo';
+import { 
+  Bars3Icon, 
+  XMarkIcon, 
+  ArrowRightOnRectangleIcon,
+  Cog6ToothIcon
+} from '@heroicons/react/24/outline';
 
-function Navbar() {
-  const { user, signOut } = useAuth();
+export default function Navbar() {
+  const { user, signOut, profile } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleLogout = async () => {
     await signOut();
     navigate('/auth');
-  };  return (
-    <nav className="bg-white shadow mb-6">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">        <div className="flex items-center space-x-6">
-          <Link to="/dashboard" className="hover:opacity-80 transition-opacity">
-            <Logo className="h-8" />
-          </Link>
-          <Link to="/dashboard" className="text-gray-700 hover:text-blue-600">Dashboard</Link>
-          <Link to="/rubrics" className="text-gray-700 hover:text-blue-600">Rubrics</Link>
-          <Link to="/students" className="text-gray-700 hover:text-blue-600">Students</Link>
-          <Link to="/essay-feedback" className="text-gray-700 hover:text-blue-600">Essay Feedback</Link>
-          <Link to="/analytics" className="text-gray-700 hover:text-blue-600">Analytics</Link>
-          <Link to="/batch" className="text-gray-700 hover:text-blue-600">Batch</Link>
-        </div>
-        <div className="flex items-center space-x-4">
-          {user && <span className="text-sm text-gray-500">{user.email}</span>}
-          <button onClick={handleLogout} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Logout</button>
+  };
+
+  const navLinks = [
+    { name: 'Dashboard', path: '/dashboard' },
+    { name: 'Rubrics', path: '/rubrics' },
+    { name: 'Students', path: '/students' },
+    { name: 'Essay Feedback', path: '/essay-feedback' },
+    { name: 'Analytics', path: '/analytics' },
+    { name: 'Batch', path: '/batch' },
+  ];
+
+  return (
+    <nav className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          {/* Logo & Desktop Nav */}
+          <div className="flex">
+            <div className="flex-shrink-0 flex items-center">
+              <Link to="/dashboard">
+                <Logo className="h-8 w-auto" />
+              </Link>
+            </div>
+            <div className="hidden md:ml-6 md:flex md:space-x-4 items-center">
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`inline-flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
+                        : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Right Side: Profile & Mobile Menu Button */}
+          <div className="flex items-center">
+            {/* Profile Dropdown */}
+            <div className="hidden md:ml-4 md:flex md:items-center">
+              <div className="relative" ref={profileRef}>
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="flex items-center max-w-xs text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  <span className="sr-only">Open user menu</span>
+                  <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800">
+                    {profile?.full_name ? profile.full_name[0].toUpperCase() : user?.email?.[0].toUpperCase()}
+                  </div>
+                </button>
+
+                {isProfileOpen && (
+                  <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+                    <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-600">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Signed in as</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user?.email}</p>
+                    </div>
+                    <Link
+                      to="/account"
+                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
+                      onClick={() => setIsProfileOpen(false)}
+                    >
+                      <div className="flex items-center">
+                        <Cog6ToothIcon className="mr-2 h-4 w-4" />
+                        Settings
+                      </div>
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600"
+                    >
+                      <div className="flex items-center">
+                        <ArrowRightOnRectangleIcon className="mr-2 h-4 w-4" />
+                        Sign out
+                      </div>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Mobile menu button */}
+            <div className="-mr-2 flex items-center md:hidden">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              >
+                <span className="sr-only">Open main menu</span>
+                {isMobileMenuOpen ? (
+                  <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                ) : (
+                  <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                )}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+          <div className="pt-2 pb-3 space-y-1 px-2">
+            {navLinks.map((link) => {
+              const isActive = location.pathname === link.path;
+              return (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-3 py-2 rounded-md text-base font-medium ${
+                    isActive
+                      ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
+          </div>
+          <div className="pt-4 pb-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex items-center px-5">
+              <div className="flex-shrink-0">
+                <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-700 dark:text-blue-300 font-bold text-lg border border-blue-200 dark:border-blue-800">
+                  {profile?.full_name ? profile.full_name[0].toUpperCase() : user?.email?.[0].toUpperCase()}
+                </div>
+              </div>
+              <div className="ml-3">
+                <div className="text-base font-medium text-gray-800 dark:text-white">
+                  {profile?.full_name || 'Teacher'}
+                </div>
+                <div className="text-sm font-medium text-gray-500 dark:text-gray-400">{user?.email}</div>
+              </div>
+            </div>
+            <div className="mt-3 px-2 space-y-1">
+              <Link
+                to="/account"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-white dark:hover:bg-gray-700"
+              >
+                Settings
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="w-full text-left block px-3 py-2 rounded-md text-base font-medium text-red-600 hover:text-red-800 hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
-
-export default Navbar;

@@ -7,13 +7,35 @@ import Navbar from '../components/Navbar';
 import { notify } from '../utils/notify';
 
 export default function AccountSettings() {
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [fullName, setFullName] = useState(profile?.full_name || '');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [sessionTimeout, setSessionTimeout] = useState(() => {
     return localStorage.getItem('simple-rubriq-session-timeout') || '30';
   });
+
+  // Update profile information
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ full_name: fullName, updated_at: new Date().toISOString() })
+        .eq('id', user?.id);
+
+      if (error) throw error;
+      notify.success('Profile updated successfully');
+      await refreshProfile(); 
+    } catch (error: any) {
+      console.error('Profile update error:', error);
+      notify.error('Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Export all user data (GDPR Article 20 - Right to Data Portability)
   const handleExportData = async () => {
@@ -117,7 +139,26 @@ export default function AccountSettings() {
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
           Account Information
         </h2>
-        <div className="space-y-3">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Full Name</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="Enter your name"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+              />
+              <button
+                onClick={handleUpdateProfile}
+                disabled={loading}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                {loading ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          </div>
           <div>
             <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Email</label>
             <p className="text-gray-900 dark:text-white">{user?.email}</p>

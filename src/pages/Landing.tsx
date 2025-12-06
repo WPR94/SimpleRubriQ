@@ -27,7 +27,7 @@ function Landing() {
         <div className="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
           {/* Logo */}
           <Link to="/" className="inline-flex items-center group" aria-label="Simple Rubriq Home">
-            <Logo className="h-8 sm:h-10 transition-transform group-hover:scale-105" />
+            <Logo className="h-8 sm:h-10 text-white transition-transform group-hover:scale-105" variant="mono" />
           </Link>
 
           {/* Desktop Navigation */}

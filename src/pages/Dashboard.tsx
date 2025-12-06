@@ -12,7 +12,7 @@ import { OnboardingTour, useOnboardingTour } from '../components/OnboardingTour'
 import { useDashboardStats, useFeedbackData } from '../hooks/useDashboard';
 
 function Dashboard() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -163,7 +163,7 @@ function Dashboard() {
           <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-                {getGreeting()}, Teacher! 👋
+                {getGreeting()}, {profile?.full_name || 'Teacher'}! 👋
               </h2>
               <p className="text-sm sm:text-base text-gray-600">
                 Here's what's happening with your students today.

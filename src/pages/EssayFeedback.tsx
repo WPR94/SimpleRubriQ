@@ -775,6 +775,8 @@ function EssayFeedback() {
               </>
             )}
           </button>
+        </div>
+        
         {/* Generate Button */}
         <button
           type="button"

@@ -316,7 +316,7 @@ function Analytics() {
     }));
 
     const timestamp = new Date().toISOString().split('T')[0];
-    const filename = `markmate-analytics-${timestamp}.csv`;
+    const filename = `simple-rubriq-analytics-${timestamp}.csv`;
 
     try {
       exportToCSV(exportData, filename);

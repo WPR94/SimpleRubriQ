@@ -15,6 +15,8 @@ import { useKeyboardShortcuts, KeyboardShortcutsHelp } from '../hooks/useKeyboar
 import CommentBank from '../components/CommentBank';
 import { useTeacherRubrics, useTeacherStudents } from '../hooks/useTeacherData';
 
+type FeedbackTone = 'encouraging' | 'strict' | 'concise' | 'socratic';
+
 // Helper to create a simple text highlight based on keyword matching
 function highlightEssayText(text: string, feedback: AiFeedback | null): React.ReactNode[] {
   if (!feedback) {
@@ -78,7 +80,8 @@ function EssayFeedback() {
   const [content, setContent] = useState('');
   const [rubricId, setRubricId] = useState<string>('');
   const [studentId, setStudentId] = useState<string>('');
-    const [customPrompt, setCustomPrompt] = useState<string>('Please provide detailed, constructive feedback for this essay based on the rubric criteria.');
+  const [customPrompt, setCustomPrompt] = useState<string>('Please provide detailed, constructive feedback for this essay based on the rubric criteria.');
+  const [selectedTone, setSelectedTone] = useState<FeedbackTone>('encouraging');
   const { data: rubrics = [], isLoading: rubricsLoading } = useTeacherRubrics();
   const { data: students = [], isLoading: studentsLoading } = useTeacherStudents();
   const [bandAnalysis, setBandAnalysis] = useState<any>(null);
@@ -203,6 +206,20 @@ function EssayFeedback() {
       const selectedRubric = rubrics.find(r => r.id === rubricId);
       const examBoard = selectedRubric?.exam_board;
       
+      // Construct full prompt with tone
+      const toneInstructions = {
+        encouraging: "Use a warm, growth-mindset tone. Focus on effort and future improvement. Use phrases like 'I love how you...' or 'Next time, try...'.",
+        strict: "Use a formal, academic tone. Be direct about errors. Focus on rigorous adherence to the rubric.",
+        concise: "Be extremely brief. Bullet points only. No fluff. Focus strictly on actionable changes.",
+        socratic: "Ask questions instead of giving answers. Guide the student to find their own mistakes."
+      };
+
+      const fullPrompt = `
+        ${customPrompt ? `Teacher Instructions: ${customPrompt}` : ''}
+        
+        Tone of Voice: ${toneInstructions[selectedTone]}
+      `;
+
       // Try edge function first (secure server-side), fallback to enhanced client-side
       let feedbackText: string;
       let score: number;
@@ -211,13 +228,13 @@ function EssayFeedback() {
       try {
         // Attempt to use Edge Function (most secure)
         console.log('📡 Trying Edge Function for feedback generation...');
-        feedbackText = await generateFeedbackViaEdgeFunction(content, rubricCriteria, customPrompt);
+        feedbackText = await generateFeedbackViaEdgeFunction(content, rubricCriteria, fullPrompt);
         score = await generateScoreViaEdgeFunction(content, rubricCriteria);
         console.log('✅ Using Edge Function - API key safely on server');
       } catch (edgeFunctionError) {
         console.warn('⚠️ Edge Function failed, falling back to enhanced client-side OpenAI:', edgeFunctionError);
         // Fallback to enhanced client-side OpenAI with GCSE analysis
-        feedbackText = await generateEssayFeedback(content, rubricCriteria, examBoard, customPrompt);
+        feedbackText = await generateEssayFeedback(content, rubricCriteria, examBoard, fullPrompt);
         score = await generateEssayScore(content, rubricCriteria);
         
         // Get detailed band analysis if GCSE rubric
@@ -601,6 +618,36 @@ function EssayFeedback() {
           </div>
         ) : (
         <>
+        {/* Tone Selector */}
+        <div className="mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            Feedback Tone
+          </label>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {(['encouraging', 'strict', 'concise', 'socratic'] as FeedbackTone[]).map((tone) => (
+              <button
+                key={tone}
+                type="button"
+                onClick={() => setSelectedTone(tone)}
+                className={`
+                  px-4 py-2 rounded-md text-sm font-medium capitalize transition-all
+                  ${selectedTone === tone 
+                    ? 'bg-indigo-600 text-white shadow-md ring-2 ring-indigo-200' 
+                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'}
+                `}
+              >
+                {tone}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-gray-500 mt-2">
+            {selectedTone === 'encouraging' && "Warm and supportive, focusing on growth."}
+            {selectedTone === 'strict' && "Formal and objective, focusing on standards."}
+            {selectedTone === 'concise' && "Short, bulleted, and to the point."}
+            {selectedTone === 'socratic' && "Asks guiding questions to provoke thought."}
+          </p>
+        </div>
+
         {/* Custom Feedback Prompt */}
         <div className="mb-6">
           <label htmlFor="custom-prompt" className="block font-semibold text-gray-700 mb-2">

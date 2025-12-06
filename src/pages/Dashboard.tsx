@@ -73,6 +73,39 @@ function Dashboard() {
     ];
   }, [feedbackData]);
 
+  // Calculate Class Insights
+  const classInsights = useMemo(() => {
+    if (!feedbackData || feedbackData.length === 0) return null;
+
+    const allImprovements: string[] = [];
+    const allStrengths: string[] = [];
+
+    feedbackData.forEach(f => {
+      if (f.improvements) allImprovements.push(...f.improvements);
+      if (f.strengths) allStrengths.push(...f.strengths);
+    });
+
+    const getTop3 = (arr: string[]) => {
+      const counts: Record<string, number> = {};
+      arr.forEach(item => {
+        // Simple normalization to group similar feedback
+        // In a real app, you might use more advanced NLP clustering here
+        const key = item.trim(); 
+        counts[key] = (counts[key] || 0) + 1;
+      });
+      
+      return Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([text, count]) => ({ text, count }));
+    };
+
+    return {
+      commonPitfalls: getTop3(allImprovements),
+      commonStrengths: getTop3(allStrengths)
+    };
+  }, [feedbackData]);
+
   // Keyboard shortcuts
   useKeyboardShortcuts([
     {
@@ -263,6 +296,53 @@ function Dashboard() {
                   )}
                 </div>
               </div>
+
+              {/* Class Insights Section */}
+              {classInsights && (classInsights.commonPitfalls.length > 0 || classInsights.commonStrengths.length > 0) && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" data-tour="analytics">
+                  {/* Common Pitfalls */}
+                  <div className="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                      <span className="text-2xl">⚠️</span> Common Pitfalls
+                    </h3>
+                    {classInsights.commonPitfalls.length > 0 ? (
+                      <ul className="space-y-3">
+                        {classInsights.commonPitfalls.map((item, idx) => (
+                          <li key={idx} className="flex items-start justify-between text-sm">
+                            <span className="text-gray-700 flex-1 mr-2">{item.text}</span>
+                            <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-bold whitespace-nowrap">
+                              {item.count} students
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-gray-500 text-sm">No common pitfalls detected yet.</p>
+                    )}
+                  </div>
+
+                  {/* Class Strengths */}
+                  <div className="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                      <span className="text-2xl">💪</span> Class Strengths
+                    </h3>
+                    {classInsights.commonStrengths.length > 0 ? (
+                      <ul className="space-y-3">
+                        {classInsights.commonStrengths.map((item, idx) => (
+                          <li key={idx} className="flex items-start justify-between text-sm">
+                            <span className="text-gray-700 flex-1 mr-2">{item.text}</span>
+                            <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold whitespace-nowrap">
+                              {item.count} students
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-gray-500 text-sm">No common strengths detected yet.</p>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Recent Activity */}
               <div className="bg-white rounded-lg shadow mb-8">

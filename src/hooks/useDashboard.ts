@@ -17,6 +17,8 @@ type RecentFeedback = {
 type FeedbackData = {
   created_at: string;
   overall_score: number;
+  strengths?: string[];
+  improvements?: string[];
 };
 
 async function fetchDashboardStats(userId: string): Promise<{ stats: DashboardStats; recentFeedback: RecentFeedback[] }> {
@@ -73,7 +75,7 @@ async function fetchDashboardStats(userId: string): Promise<{ stats: DashboardSt
 async function fetchFeedbackData(userId: string): Promise<FeedbackData[]> {
   const { data, error } = await supabase
     .from('feedback')
-    .select('created_at, overall_score, essays!inner(teacher_id)')
+    .select('created_at, overall_score, strengths, improvements, essays!inner(teacher_id)')
     .eq('essays.teacher_id', userId)
     .order('created_at', { ascending: false })
     .limit(30);

@@ -19,12 +19,19 @@ export default function AccountSettings() {
   // Update profile information
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
+    
     setLoading(true);
     try {
+      // Use upsert to handle both update and create cases
       const { error } = await supabase
         .from('profiles')
-        .update({ full_name: fullName, updated_at: new Date().toISOString() })
-        .eq('id', user?.id);
+        .upsert({ 
+          id: user.id,
+          email: user.email,
+          full_name: fullName, 
+          updated_at: new Date().toISOString() 
+        });
 
       if (error) throw error;
       notify.success('Profile updated successfully');

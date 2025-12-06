@@ -9,16 +9,16 @@ DROP POLICY IF EXISTS "Profiles update self or admins" ON public.profiles;
 -- Create simplified, non-recursive policies (avoid 500s from self-referencing EXISTS)
 CREATE POLICY "Profiles select own"
   ON public.profiles FOR SELECT
-  USING (auth.uid() = user_id);
+  USING (auth.uid() = id);
 
 CREATE POLICY "Profiles insert self"
   ON public.profiles FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (auth.uid() = id);
 
 CREATE POLICY "Profiles update self"
   ON public.profiles FOR UPDATE
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
+  USING (auth.uid() = id)
+  WITH CHECK (auth.uid() = id);
 
 -- Optional: add a separate admin-only policy later via a SECURITY DEFINER function
 

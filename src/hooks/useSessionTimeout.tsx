@@ -16,7 +16,7 @@ export function useSessionTimeout() {
   // Get timeout from localStorage (in minutes)
   const getTimeoutMinutes = () => {
     const stored = localStorage.getItem('simple-rubriq-session-timeout');
-    return stored ? parseInt(stored) : 30; // Default 30 minutes
+    return stored ? parseInt(stored) : 120; // Default 120 minutes (2 hours)
   };
 
   const resetTimer = () => {

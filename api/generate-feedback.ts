@@ -53,7 +53,7 @@ If the student's work contains explicit mentions or strong indicators of self-ha
 1. Assess against GCSE Assessment Objectives (AO1-AO4 where applicable)
 2. Assign band levels (1=emerging, 2-3=developing, 4-5=secure, 6=exceptional)
 3. Quote specific evidence from their writing
-4. Write conversationally - vary sentence starters, sound human
+5. Provide a JSON object with breakdown scores for each rubric criterion (0-100)
 
 ✨ TONE:
 - Encouraging yet honest - celebrate wins, be constructive about gaps
@@ -90,22 +90,28 @@ ${essayText}
 2. 2-3 development areas with examples
 3. Grammar/SPaG issues if significant
 4. Natural summary (300-400 words max)
+5. A JSON object named "criteria_scores" mapping rubric categories to scores (0-100)
 
 Be specific. Quote their work. Sound like a real teacher, not a robot.`,
         },
       ],
       temperature: 0.85,
-      max_tokens: 800,
+      max_tokens: 1000,
+      response_format: { type: "json_object" } // Force JSON output for easier parsing
     });
 
     const content = response.choices[0]?.message?.content;
     if (!content) {
       throw new Error('No feedback generated');
     }
+    
+    // Parse the JSON response
+    const parsedContent = JSON.parse(content);
+    
     // Add diagnostics header (non-sensitive)
     const key = process.env.OPENAI_API_KEY || '';
     res.setHeader('X-Diagnostics', `openaiKeyPresent=${!!key};keyStart=${key.slice(0,8)}`);
-    return res.status(200).json({ feedback: content });
+    return res.status(200).json({ feedback: parsedContent });
   } catch (error: any) {
     console.error('OpenAI API Error:', error);
     

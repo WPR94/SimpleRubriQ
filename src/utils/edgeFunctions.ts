@@ -9,6 +9,7 @@ export type AiFeedback = {
   criteria_matches: CriteriaMatch[];
   suggested_feedback: string;
   overall_score: number;
+  criteria_scores?: Record<string, number>; // New field for dynamic grading
 };
 
 /**
@@ -47,6 +48,11 @@ export async function generateAiFeedback(
       criteria_matches,
       suggested_feedback: 'Well done overall. Focus on adding concrete evidence and polishing sentence structure.',
       overall_score: scoreBase,
+      criteria_scores: {
+        'Content': Math.min(100, scoreBase + 5),
+        'Organization': Math.max(0, scoreBase - 5),
+        'Language': scoreBase
+      }
     };
   };
 

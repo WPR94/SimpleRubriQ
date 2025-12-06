@@ -128,8 +128,13 @@ function Analytics() {
           .from('rubrics')
           .select('id, name')
           .in('id', Array.from(rubricIdSet));
-        if (rubricsError) throw rubricsError;
-        rubricMap = new Map((rubricsData || []).map((r: any) => [r.id, r.name]));
+        
+        // If rubrics fail to load, we can still proceed with just IDs or placeholders
+        if (!rubricsError && rubricsData) {
+          rubricMap = new Map((rubricsData || []).map((r: any) => [r.id, r.name]));
+        } else {
+          console.warn('Failed to load rubric names for analytics', rubricsError);
+        }
       }
 
       // Transform feedback data

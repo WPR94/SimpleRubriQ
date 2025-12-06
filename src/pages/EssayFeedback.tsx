@@ -95,7 +95,7 @@ function EssayFeedback() {
   const [showAoLegend, setShowAoLegend] = useState(false);
   const initialLoading = rubricsLoading || studentsLoading;
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const scanInputRef = useRef<HTMLInputElement>(null);
+  const feedbackRef = useRef<HTMLDivElement>(null);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -368,6 +368,11 @@ function EssayFeedback() {
       } else {
         console.log('✅ Essay and feedback saved successfully!');
         notify.success('AI feedback generated and saved successfully!');
+        
+        // Auto-scroll to feedback section
+        setTimeout(() => {
+          feedbackRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
       }
     } catch (error) {
       console.error('❌ Generate error:', error);
@@ -910,7 +915,7 @@ function EssayFeedback() {
         
         {/* Feedback Display */}
         {feedback && (
-          <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-6 space-y-6">
+          <div ref={feedbackRef} className="bg-white border border-gray-200 rounded-xl shadow-lg p-6 space-y-6 animate-fade-in-up">
             {/* Success Banner */}
             <div className="bg-green-50 border-2 border-green-300 rounded-lg p-6 mb-6">
               <div className="flex items-center justify-between mb-4">

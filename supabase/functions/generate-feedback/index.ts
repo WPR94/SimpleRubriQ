@@ -77,10 +77,11 @@ serve(async (req: Request): Promise<Response> => {
     );
   }
 
-  const { essay, rubricCriteria, type } = (body as { 
+  const { essay, rubricCriteria, type, customPrompt } = (body as { 
     essay?: string
     rubricCriteria?: string
     type?: 'feedback' | 'score' | 'both'
+    customPrompt?: string
   }) ?? {};
 
   if (typeof essay !== "string" || typeof rubricCriteria !== "string") {
@@ -127,7 +128,9 @@ serve(async (req: Request): Promise<Response> => {
             Be specific, encouraging, and actionable. Format your feedback clearly with sections for:
             - Strengths (what the student did well)
             - Areas for Improvement (constructive suggestions)
-            - Action Steps (concrete next steps)` 
+            - Action Steps (concrete next steps)
+            
+            ${customPrompt ? `ADDITIONAL INSTRUCTION: ${customPrompt}` : ''}` 
           },
           {
             role: "user",

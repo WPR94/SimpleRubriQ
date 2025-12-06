@@ -29,7 +29,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: 'API key not configured. Please add OPENAI_API_KEY to environment variables.' });
     }
 
-    const { essayText, rubricCriteria, examBoard } = req.body;
+    const { essayText, rubricCriteria, examBoard, customPrompt } = req.body;
 
     if (!essayText || !rubricCriteria) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -41,6 +41,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         {
           role: 'system',
           content: `You are an experienced GCSE English teacher and examiner${examBoard ? ` for ${examBoard}` : ''}. Provide warm, authentic feedback as if speaking face-to-face with your student.
+
+${customPrompt ? `TEACHER INSTRUCTION: ${customPrompt}\n` : ''}
 
 📋 YOUR TASK:
 1. Assess against GCSE Assessment Objectives (AO1-AO4 where applicable)

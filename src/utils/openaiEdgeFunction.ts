@@ -6,13 +6,15 @@ import { supabase } from '../lib/supabaseClient';
  */
 export async function generateFeedbackViaEdgeFunction(
   essay: string,
-  rubricCriteria: string
+  rubricCriteria: string,
+  customPrompt?: string
 ): Promise<string> {
   try {
     const { data, error } = await supabase.functions.invoke('generate-feedback', {
       body: {
         essay,
         rubricCriteria,
+        customPrompt,
         type: 'feedback',
       },
     });

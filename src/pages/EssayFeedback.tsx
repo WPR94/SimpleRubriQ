@@ -211,13 +211,13 @@ function EssayFeedback() {
       try {
         // Attempt to use Edge Function (most secure)
         console.log('📡 Trying Edge Function for feedback generation...');
-        feedbackText = await generateFeedbackViaEdgeFunction(content, rubricCriteria);
+        feedbackText = await generateFeedbackViaEdgeFunction(content, rubricCriteria, customPrompt);
         score = await generateScoreViaEdgeFunction(content, rubricCriteria);
         console.log('✅ Using Edge Function - API key safely on server');
       } catch (edgeFunctionError) {
         console.warn('⚠️ Edge Function failed, falling back to enhanced client-side OpenAI:', edgeFunctionError);
         // Fallback to enhanced client-side OpenAI with GCSE analysis
-        feedbackText = await generateEssayFeedback(content, rubricCriteria, examBoard);
+        feedbackText = await generateEssayFeedback(content, rubricCriteria, examBoard, customPrompt);
         score = await generateEssayScore(content, rubricCriteria);
         
         // Get detailed band analysis if GCSE rubric

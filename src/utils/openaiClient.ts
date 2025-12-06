@@ -31,13 +31,14 @@ export interface EnhancedFeedback {
 export async function generateEssayFeedback(
   essayText: string,
   rubricCriteria: string,
-  examBoard?: string
+  examBoard?: string,
+  customPrompt?: string
 ): Promise<string> {
   try {
     const response = await fetch(`${API_BASE}/generate-feedback`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ essayText, rubricCriteria, examBoard }),
+      body: JSON.stringify({ essayText, rubricCriteria, examBoard, customPrompt }),
     });
 
     // Check if response is JSON

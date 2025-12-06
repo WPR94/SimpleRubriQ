@@ -28,6 +28,7 @@ interface FeedbackData {
   created_at: string;
   essay_title: string;
   rubric_name: string;
+  student_name?: string;
 }
 
 interface GradeDistribution {
@@ -47,6 +48,13 @@ interface RubricPerformance {
   count: number;
 }
 
+interface StudentPerformance {
+  name: string;
+  avgScore: number;
+  essayCount: number;
+  trend: 'up' | 'down' | 'stable';
+}
+
 function Analytics() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -61,6 +69,7 @@ function Analytics() {
   const [gradeDistribution, setGradeDistribution] = useState<GradeDistribution[]>([]);
   const [trendData, setTrendData] = useState<TrendData[]>([]);
   const [rubricPerformance, setRubricPerformance] = useState<RubricPerformance[]>([]);
+  const [studentPerformance, setStudentPerformance] = useState<StudentPerformance[]>([]);
 
   useEffect(() => {
     if (user?.id) {
@@ -99,7 +108,7 @@ function Analytics() {
       // Load feedback joined to essays for this teacher (limit to recent subset)
       const { data: feedbackJoined, error: feedbackError } = await supabase
         .from('feedback')
-        .select('id, essay_id, overall_score, created_at, essays!inner(id,title,rubric_id,teacher_id)')
+        .select('id, essay_id, overall_score, created_at, essays!inner(id,title,rubric_id,teacher_id, students(name))')
         .eq('essays.teacher_id', user!.id)
         .order('created_at', { ascending: false })
         .limit(500);
@@ -127,6 +136,7 @@ function Analytics() {
       const transformedFeedback: FeedbackData[] = (feedbackJoined || []).map((f: any) => {
         const essayTitle = f.essays?.title || 'Untitled Essay';
         const rname = f.essays?.rubric_id ? rubricMap.get(f.essays.rubric_id) || '—' : '—';
+        const sname = f.essays?.students?.name || 'Unknown Student';
         return {
           id: f.id,
           essay_id: f.essay_id,
@@ -134,6 +144,7 @@ function Analytics() {
           created_at: f.created_at,
           essay_title: essayTitle,
           rubric_name: rname,
+          student_name: sname,
         };
       });
 
@@ -234,6 +245,40 @@ function Analytics() {
         }));
 
         setRubricPerformance(performance);
+
+        // Calculate Student Performance
+        const studentGroups: { [key: string]: { scores: number[], dates: Date[] } } = {};
+        transformedFeedback.forEach(f => {
+          if (f.student_name && f.student_name !== 'Unknown Student') {
+            if (!studentGroups[f.student_name]) studentGroups[f.student_name] = { scores: [], dates: [] };
+            studentGroups[f.student_name].scores.push(f.overall_score);
+            studentGroups[f.student_name].dates.push(new Date(f.created_at));
+          }
+        });
+
+        const studentPerf = Object.entries(studentGroups).map(([name, data]) => {
+          const avgScore = Math.round(data.scores.reduce((a, b) => a + b, 0) / data.scores.length);
+          
+          // Determine trend (compare last score to average of previous)
+          let trend: 'up' | 'down' | 'stable' = 'stable';
+          if (data.scores.length >= 2) {
+            // Sort by date
+            const sorted = data.scores.map((s, i) => ({ s, d: data.dates[i] })).sort((a, b) => a.d.getTime() - b.d.getTime());
+            const lastScore = sorted[sorted.length - 1].s;
+            const prevScore = sorted[sorted.length - 2].s;
+            if (lastScore > prevScore + 5) trend = 'up';
+            else if (lastScore < prevScore - 5) trend = 'down';
+          }
+
+          return {
+            name,
+            avgScore,
+            essayCount: data.scores.length,
+            trend
+          };
+        });
+
+        setStudentPerformance(studentPerf);
       }
     } catch (error: any) {
       console.error('Error loading analytics:', error);
@@ -250,6 +295,7 @@ function Analytics() {
       setGradeDistribution([]);
       setTrendData([]);
       setRubricPerformance([]);
+      setStudentPerformance([]);
     } finally {
       setLoading(false);
     }
@@ -346,32 +392,170 @@ function Analytics() {
 
           {/* Key Metrics */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500">
-              <h3 className="text-sm font-semibold text-gray-600 mb-1">Essays Graded</h3>
-              <p className="text-3xl font-bold text-gray-900">{metrics.essaysGraded}</p>
-              <p className="text-xs text-gray-500 mt-2">Total assignments processed</p>
+            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500 flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-gray-600 mb-1">Essays Graded</h3>
+                <p className="text-3xl font-bold text-gray-900">{metrics.essaysGraded}</p>
+                <p className="text-xs text-gray-500 mt-2">Total assignments</p>
+              </div>
+              <div className="bg-purple-100 p-3 rounded-full">
+                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500">
-              <h3 className="text-sm font-semibold text-gray-600 mb-1">Time Saved</h3>
-              <p className="text-3xl font-bold text-green-600">{metrics.timeSavedHours}h</p>
-              <p className="text-xs text-gray-500 mt-2">~{Math.round(metrics.timeSavedHours * 60)} minutes</p>
+            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500 flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-gray-600 mb-1">Time Saved</h3>
+                <p className="text-3xl font-bold text-green-600">{metrics.timeSavedHours}h</p>
+                <p className="text-xs text-gray-500 mt-2">~{Math.round(metrics.timeSavedHours * 60)} mins</p>
+              </div>
+              <div className="bg-green-100 p-3 rounded-full">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
-              <h3 className="text-sm font-semibold text-gray-600 mb-1">Average Score</h3>
-              <p className="text-3xl font-bold text-gray-900">{metrics.averageScore}%</p>
-              <p className="text-xs text-gray-500 mt-2">Mean student performance</p>
+            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500 flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-gray-600 mb-1">Average Score</h3>
+                <p className="text-3xl font-bold text-gray-900">{metrics.averageScore}%</p>
+                <p className="text-xs text-gray-500 mt-2">Mean performance</p>
+              </div>
+              <div className="bg-blue-100 p-3 rounded-full">
+                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500">
-              <h3 className="text-sm font-semibold text-gray-600 mb-1">Median Score</h3>
-              <p className="text-3xl font-bold text-gray-900">{metrics.medianScore}%</p>
-              <p className="text-xs text-gray-500 mt-2">Middle value (typical)</p>
+            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-orange-500 flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-gray-600 mb-1">Median Score</h3>
+                <p className="text-3xl font-bold text-gray-900">{metrics.medianScore}%</p>
+                <p className="text-xs text-gray-500 mt-2">Typical score</p>
+              </div>
+              <div className="bg-orange-100 p-3 rounded-full">
+                <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+              </div>
             </div>
-            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-red-500">
-              <h3 className="text-sm font-semibold text-gray-600 mb-1">Score Spread</h3>
-              <p className="text-3xl font-bold text-gray-900">{metrics.standardDeviation}</p>
-              <p className="text-xs text-gray-500 mt-2">Consistency (lower = more consistent)</p>
+            <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-red-500 flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-gray-600 mb-1">Score Spread</h3>
+                <p className="text-3xl font-bold text-gray-900">{metrics.standardDeviation}</p>
+                <p className="text-xs text-gray-500 mt-2">Consistency</p>
+              </div>
+              <div className="bg-red-100 p-3 rounded-full">
+                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                </svg>
+              </div>
             </div>
           </div>
+
+          {/* Student Performance Insights */}
+          {studentPerformance.length > 0 && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              {/* Students at Risk */}
+              <div className="bg-white rounded-lg shadow-md overflow-hidden border border-red-100">
+                <div className="bg-red-50 px-6 py-4 border-b border-red-100 flex justify-between items-center">
+                  <h3 className="text-lg font-bold text-red-800 flex items-center gap-2">
+                    <span className="text-xl">⚠️</span> Students at Risk
+                  </h3>
+                  <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded-full">
+                    Avg &lt; 60%
+                  </span>
+                </div>
+                <div className="p-0">
+                  {studentPerformance.filter(s => s.avgScore < 60).length > 0 ? (
+                    <table className="w-full text-sm text-left">
+                      <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-100">
+                        <tr>
+                          <th className="px-6 py-3">Student</th>
+                          <th className="px-6 py-3">Avg Score</th>
+                          <th className="px-6 py-3">Trend</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {studentPerformance
+                          .filter(s => s.avgScore < 60)
+                          .sort((a, b) => a.avgScore - b.avgScore)
+                          .slice(0, 5)
+                          .map((student, idx) => (
+                            <tr key={idx} className="hover:bg-gray-50">
+                              <td className="px-6 py-3 font-medium text-gray-900">{student.name}</td>
+                              <td className="px-6 py-3">
+                                <span className="px-2 py-1 bg-red-100 text-red-700 rounded font-bold">
+                                  {student.avgScore}%
+                                </span>
+                              </td>
+                              <td className="px-6 py-3">
+                                {student.trend === 'down' && <span className="text-red-600">↘ Declining</span>}
+                                {student.trend === 'up' && <span className="text-green-600">↗ Improving</span>}
+                                {student.trend === 'stable' && <span className="text-gray-500">→ Stable</span>}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <div className="p-8 text-center text-gray-500">
+                      <p>🎉 No students currently flagged as at-risk.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Top Performers */}
+              <div className="bg-white rounded-lg shadow-md overflow-hidden border border-green-100">
+                <div className="bg-green-50 px-6 py-4 border-b border-green-100 flex justify-between items-center">
+                  <h3 className="text-lg font-bold text-green-800 flex items-center gap-2">
+                    <span className="text-xl">🏆</span> Top Performers
+                  </h3>
+                  <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                    Avg &gt; 85%
+                  </span>
+                </div>
+                <div className="p-0">
+                  {studentPerformance.filter(s => s.avgScore >= 85).length > 0 ? (
+                    <table className="w-full text-sm text-left">
+                      <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-100">
+                        <tr>
+                          <th className="px-6 py-3">Student</th>
+                          <th className="px-6 py-3">Avg Score</th>
+                          <th className="px-6 py-3">Essays</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {studentPerformance
+                          .filter(s => s.avgScore >= 85)
+                          .sort((a, b) => b.avgScore - a.avgScore)
+                          .slice(0, 5)
+                          .map((student, idx) => (
+                            <tr key={idx} className="hover:bg-gray-50">
+                              <td className="px-6 py-3 font-medium text-gray-900">{student.name}</td>
+                              <td className="px-6 py-3">
+                                <span className="px-2 py-1 bg-green-100 text-green-700 rounded font-bold">
+                                  {student.avgScore}%
+                                </span>
+                              </td>
+                              <td className="px-6 py-3 text-gray-600">
+                                {student.essayCount} graded
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <div className="p-8 text-center text-gray-500">
+                      <p>Keep grading to identify top performers.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Charts Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -463,39 +647,65 @@ function Analytics() {
 
           {/* Rubric Performance */}
           {rubricPerformance.length > 0 && (
-            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md mb-8">
               <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Performance by Rubric</h3>
               <div className="w-full overflow-x-auto">
                 <ResponsiveContainer width="100%" height={300} minWidth={400}>
-                  <BarChart data={rubricPerformance} layout="horizontal">
-                    <CartesianGrid strokeDasharray="3 3" />
+                  <BarChart data={rubricPerformance} layout="vertical" margin={{ left: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                     <XAxis type="number" domain={[0, 100]} />
-                    <YAxis dataKey="name" type="category" width={150} />
-                    <Tooltip />
+                    <YAxis dataKey="name" type="category" width={150} tick={{ fontSize: 12 }} />
+                    <Tooltip cursor={{ fill: 'transparent' }} />
                     <Legend />
-                    <Bar dataKey="avgScore" fill="#10b981" name="Average Score" />
+                    <Bar dataKey="avgScore" fill="#10b981" name="Average Score" radius={[0, 4, 4, 0]} barSize={20} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {rubricPerformance.map((rubric, idx) => (
-                  <div key={idx} className="p-4 bg-gray-50 rounded-lg">
-                    <p className="font-semibold text-gray-900 truncate" title={rubric.name}>
-                      {rubric.name}
-                    </p>
-                    <div className="flex justify-between mt-2 text-sm">
-                      <span className="text-gray-600">Avg Score:</span>
-                      <span className="font-bold text-green-600">{rubric.avgScore}%</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Essays:</span>
-                      <span className="font-semibold">{rubric.count}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
           )}
+
+          {/* Recent Graded Essays Table */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-bold text-gray-900">Recent Graded Essays</h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm text-left">
+                <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-3">Date</th>
+                    <th className="px-6 py-3">Student</th>
+                    <th className="px-6 py-3">Essay Title</th>
+                    <th className="px-6 py-3">Rubric</th>
+                    <th className="px-6 py-3">Score</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {feedbackData.slice(0, 10).map((item) => (
+                    <tr key={item.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-3 text-gray-600">
+                        {new Date(item.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-3 font-medium text-gray-900">
+                        {item.student_name || 'Unknown'}
+                      </td>
+                      <td className="px-6 py-3 text-gray-900">{item.essay_title}</td>
+                      <td className="px-6 py-3 text-gray-600">{item.rubric_name}</td>
+                      <td className="px-6 py-3">
+                        <span className={`px-2 py-1 rounded font-bold ${
+                          item.overall_score >= 80 ? 'bg-green-100 text-green-800' :
+                          item.overall_score >= 60 ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {item.overall_score}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       )}
       </ErrorBoundary>

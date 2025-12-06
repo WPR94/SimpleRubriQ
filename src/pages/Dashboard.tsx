@@ -114,15 +114,39 @@ function Dashboard() {
     return () => { supabase.removeChannel(channel); };
   }, [user, queryClient]);
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    if (hour < 18) return 'Good Afternoon';
+    return 'Good Evening';
+  };
+
   return (
     <>
       <Navbar />
       <ErrorBoundary>
       <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-6 sm:mb-8">
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Teacher Dashboard</h2>
-            {user?.email && <p className="text-sm sm:text-base text-gray-600">Logged in as {user.email}</p>}
+          <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                {getGreeting()}, Teacher! 👋
+              </h2>
+              <p className="text-sm sm:text-base text-gray-600">
+                Here's what's happening with your students today.
+              </p>
+            </div>
+            <div className="flex gap-3">
+               <Link
+                  to="/essay-feedback"
+                  className="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                  </svg>
+                  New Feedback
+                </Link>
+            </div>
           </div>
 
           {statsLoading ? (

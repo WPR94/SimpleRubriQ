@@ -301,6 +301,15 @@ function Students() {
     URL.revokeObjectURL(url);
   };
 
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
   return (
     <>
       <Navbar />
@@ -479,7 +488,14 @@ function Students() {
               <tbody className="divide-y divide-gray-200">
                 {students.map(s => (
                   <tr key={s.id} className="hover:bg-gray-50">
-                    <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-900">{s.name}</td>
+                    <td className="px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-900">
+                      <div className="flex items-center">
+                        <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-xs mr-3">
+                          {getInitials(s.name)}
+                        </div>
+                        {s.name}
+                      </div>
+                    </td>
                     <td className="hidden md:table-cell px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-600">{s.email}</td>
                     <td className="hidden lg:table-cell px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-600">{s.grade || '-'}</td>
                     <td className="hidden lg:table-cell px-3 sm:px-4 py-3 text-xs sm:text-sm text-gray-600">{s.class_section || '-'}</td>

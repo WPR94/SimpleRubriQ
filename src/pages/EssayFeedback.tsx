@@ -725,13 +725,13 @@ function EssayFeedback() {
             disabled={uploading}
             className="flex items-center justify-center gap-2 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-                    feedbackText = await generateFeedbackViaEdgeFunction(content, rubricCriteria, customPrompt);
+            {uploading && uploadProgress > 0 ? (
               <>
                 <span className="animate-spin">⚡</span>
                 <span>Processing ({uploadProgress}%)</span>
               </>
             ) : uploading ? (
-                    feedbackText = await generateEssayFeedback(content, rubricCriteria, examBoard, customPrompt);
+              <>
                 <span className="animate-spin">⚡</span>
                 <span>Uploading...</span>
               </>

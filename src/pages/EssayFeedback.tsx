@@ -606,6 +606,26 @@ function EssayFeedback() {
           <label htmlFor="custom-prompt" className="block font-semibold text-gray-700 mb-2">
             Customize AI Feedback Prompt
           </label>
+          
+          {/* Prompt Presets */}
+          <div className="flex flex-wrap gap-2 mb-3">
+            {[
+              "Focus on grammar & spelling",
+              "Be strict with grading",
+              "Explain simply for student",
+              "Highlight creative ideas"
+            ].map((preset) => (
+              <button
+                key={preset}
+                type="button"
+                onClick={() => setCustomPrompt(preset)}
+                className="text-xs bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-200 hover:bg-blue-100 transition-colors"
+              >
+                + {preset}
+              </button>
+            ))}
+          </div>
+
           <textarea
             id="custom-prompt"
             className="border border-gray-300 p-3 w-full h-20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
@@ -693,8 +713,9 @@ function EssayFeedback() {
             onChange={e => setContent(e.target.value)}
           />
           <div className="flex justify-between items-center mt-2">
-            <p className="text-sm text-gray-600">
+            <p className={`text-sm ${content.trim().split(/\s+/).filter(Boolean).length > 3000 ? 'text-red-600 font-bold' : 'text-gray-600'}`}>
               Word count: {content.trim().split(/\s+/).filter(Boolean).length}
+              {content.trim().split(/\s+/).filter(Boolean).length > 3000 && ' (Warning: Long essay may timeout)'}
             </p>
             {content && (
               <button

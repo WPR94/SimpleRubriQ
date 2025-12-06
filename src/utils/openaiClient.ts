@@ -21,6 +21,29 @@ export interface EnhancedFeedback {
   suggested_feedback: string; // Natural teacher voice summary
 }
 
+// Helper for exponential backoff retry
+async function fetchWithRetry(url: string, options: RequestInit, retries = 3, delay = 1000): Promise<Response> {
+  try {
+    const response = await fetch(url, options);
+    
+    // Retry on 429 (Too Many Requests) or 5xx (Server Errors)
+    if (!response.ok && (response.status === 429 || response.status >= 500) && retries > 0) {
+      console.warn(`⚠️ Request failed with ${response.status}. Retrying in ${delay}ms... (${retries} attempts left)`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return fetchWithRetry(url, options, retries - 1, delay * 2);
+    }
+    
+    return response;
+  } catch (error) {
+    if (retries > 0) {
+      console.warn(`⚠️ Network error. Retrying in ${delay}ms... (${retries} attempts left)`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return fetchWithRetry(url, options, retries - 1, delay * 2);
+    }
+    throw error;
+  }
+}
+
 /**
  * Generate AI feedback for an essay with GCSE band analysis
  * @param essayText - The essay content to analyze
@@ -35,7 +58,7 @@ export async function generateEssayFeedback(
   customPrompt?: string
 ): Promise<string> {
   try {
-    const response = await fetch(`${API_BASE}/generate-feedback`, {
+    const response = await fetchWithRetry(`${API_BASE}/generate-feedback`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ essayText, rubricCriteria, examBoard, customPrompt }),
@@ -73,7 +96,7 @@ export async function generateEssayScore(
   rubricCriteria: string
 ): Promise<number> {
   try {
-    const response = await fetch(`${API_BASE}/generate-score`, {
+    const response = await fetchWithRetry(`${API_BASE}/generate-score`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ essayText, rubricCriteria }),

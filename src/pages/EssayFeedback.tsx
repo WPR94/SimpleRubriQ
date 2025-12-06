@@ -1010,10 +1010,46 @@ function EssayFeedback() {
             </div>
             
             {/* Overall Score with Band Analysis */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-lg font-semibold text-gray-700">Overall Score</span>
-                <span className="text-3xl font-bold text-blue-600">{feedback.overall_score}/100</span>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 transition-all hover:shadow-md">
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-lg font-semibold text-gray-700">Overall Score</span>
+                    <span className="text-xs text-gray-500">Adjust slider to override AI score</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      value={feedback.overall_score}
+                      onChange={(e) => {
+                        const val = Math.min(100, Math.max(0, Number(e.target.value)));
+                        setFeedback({ ...feedback, overall_score: val });
+                      }}
+                      className="w-24 text-3xl font-bold text-blue-600 bg-white border border-blue-200 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:outline-none text-right"
+                    />
+                    <span className="text-3xl font-bold text-blue-600">/100</span>
+                  </div>
+                </div>
+                
+                <div className="relative pt-1">
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={feedback.overall_score}
+                    onChange={(e) => setFeedback({ ...feedback, overall_score: Number(e.target.value) })}
+                    className="w-full h-3 bg-blue-200 rounded-lg appearance-none cursor-pointer accent-blue-600 hover:accent-blue-700"
+                  />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1 px-1">
+                    <span>0</span>
+                    <span>25</span>
+                    <span>50</span>
+                    <span>75</span>
+                    <span>100</span>
+                  </div>
+                </div>
               </div>
               
               {/* GCSE Band Analysis */}

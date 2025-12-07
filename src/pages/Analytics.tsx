@@ -106,14 +106,31 @@ function Analytics() {
       }
 
       // Load feedback joined to essays for this teacher (limit to recent subset)
-      const { data: feedbackJoined, error: feedbackError } = await supabase
+      let feedbackJoined: any[] | null = null;
+      
+      // Try fetching with student names first
+      const { data: dataWithStudents, error: errorWithStudents } = await supabase
         .from('feedback')
         .select('id, essay_id, overall_score, created_at, essays!inner(id,title,rubric_id,teacher_id, students(name))')
         .eq('essays.teacher_id', user!.id)
         .order('created_at', { ascending: false })
         .limit(500);
 
-      if (feedbackError) throw feedbackError;
+      if (!errorWithStudents) {
+        feedbackJoined = dataWithStudents;
+      } else {
+        console.warn('Failed to fetch student names (likely missing FK), falling back...', errorWithStudents);
+        // Fallback: fetch without students(name)
+        const { data: dataWithoutStudents, error: errorWithoutStudents } = await supabase
+          .from('feedback')
+          .select('id, essay_id, overall_score, created_at, essays!inner(id,title,rubric_id,teacher_id)')
+          .eq('essays.teacher_id', user!.id)
+          .order('created_at', { ascending: false })
+          .limit(500);
+          
+        if (errorWithoutStudents) throw errorWithoutStudents;
+        feedbackJoined = dataWithoutStudents;
+      }
 
       const rubricIdSet = new Set<string>();
       (feedbackJoined || []).forEach((row: any) => {

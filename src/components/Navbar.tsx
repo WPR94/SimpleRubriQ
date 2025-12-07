@@ -16,6 +16,38 @@ export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
+  const prefetched = useRef<Set<string>>(new Set());
+
+  const routePrefetchers: Record<string, () => Promise<unknown>> = {
+    '/dashboard': () => import('../pages/Dashboard'),
+    '/rubrics': () => import('../pages/Rubrics'),
+    '/students': () => import('../pages/Students'),
+    '/essay-feedback': () => import('../pages/EssayFeedback'),
+    '/feedback-history': () => import('../pages/FeedbackHistory'),
+    '/analytics': () => import('../pages/Analytics'),
+    '/batch': () => import('../pages/BatchProcessor'),
+    '/calibration': () => import('../pages/Calibration'),
+    '/demo': () => import('../pages/Demo'),
+    '/dashboard-demo': () => import('../pages/DashboardDemo'),
+    '/about': () => import('../pages/About'),
+    '/privacy': () => import('../pages/Privacy'),
+    '/terms': () => import('../pages/Terms'),
+    '/dpa': () => import('../pages/DataProcessingAgreement'),
+    '/account': () => import('../pages/AccountSettings'),
+    '/admin': () => import('../pages/AdminDashboard'),
+    '/admin/users': () => import('../pages/AdminUsers'),
+    '/admin/analytics': () => import('../pages/AdminAnalytics'),
+    '/admin/activity': () => import('../pages/AdminActivityLogs'),
+  };
+
+  const prefetchRoute = (path: string) => {
+    if (prefetched.current.has(path)) return;
+    const loader = routePrefetchers[path];
+    if (loader) {
+      prefetched.current.add(path);
+      loader().catch(() => prefetched.current.delete(path));
+    }
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -67,6 +99,8 @@ export default function Navbar() {
                   <Link
                     key={link.path}
                     to={link.path}
+                    onMouseEnter={() => prefetchRoute(link.path)}
+                    onFocus={() => prefetchRoute(link.path)}
                     className={`inline-flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                       isActive
                         ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
@@ -171,6 +205,8 @@ export default function Navbar() {
                   key={link.path}
                   to={link.path}
                   onClick={() => setIsMobileMenuOpen(false)}
+                  onMouseEnter={() => prefetchRoute(link.path)}
+                  onFocus={() => prefetchRoute(link.path)}
                   className={`block px-3 py-2 rounded-md text-base font-medium ${
                     isActive
                       ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'

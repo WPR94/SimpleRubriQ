@@ -38,7 +38,7 @@ export default function AccountSettings() {
       await refreshProfile(); 
     } catch (error: any) {
       console.error('Profile update error:', error);
-      notify.error('Failed to update profile');
+      notify.error(`Failed to update profile: ${error.message || 'Unknown error'}`);
     } finally {
       setLoading(false);
     }

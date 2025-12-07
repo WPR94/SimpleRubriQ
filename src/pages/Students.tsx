@@ -5,6 +5,7 @@ import notify from '../utils/notify';
 import Navbar from '../components/Navbar';
 import ErrorBoundary from '../components/ErrorBoundary';
 import ConfirmModal from '../components/ConfirmModal';
+import { PageGuide } from '../components/PageGuide';
 
 interface Student {
   id: string;
@@ -341,7 +342,7 @@ function Students() {
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Students Manager</h2>
             <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your students and track their essay submissions</p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-center">
             <button
               onClick={downloadCsvTemplate}
               className="bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-700 font-medium flex items-center justify-center gap-2 text-sm"
@@ -366,6 +367,18 @@ function Students() {
                 className="hidden"
               />
             </label>
+            <PageGuide
+              title="How to manage students"
+              ctaLabel="Students guide"
+              summary="Keep rosters clean and link essays easily."
+              sections={[
+                { title: 'Add or edit', body: <p>Use the form to add students. Required: name; optional: email, grade, class, ID, notes.</p> },
+                { title: 'Import CSV', body: <p>Download the template, fill it, then import. We validate and show how many rows were added.</p> },
+                { title: 'Link essays', body: <p>When grading, select the student to keep history tied to them.</p> },
+                { title: 'Active toggle', body: <p>Use the Active checkbox to archive without deleting.</p> },
+                { title: 'Shortcuts', body: <p>Ctrl+E Essay Feedback · Ctrl+R Rubrics · Ctrl+H History.</p> },
+              ]}
+            />
           </div>
         </div>
 

@@ -8,6 +8,7 @@ import Navbar from '../components/Navbar';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { FormSkeleton } from '../components/LoadingSkeleton';
 import ConfirmModal from '../components/ConfirmModal';
+import { PageGuide } from '../components/PageGuide';
 
 interface Criterion {
   id: number;
@@ -372,7 +373,24 @@ function Rubrics() {
       <Navbar />
       <ErrorBoundary>
       <div className="p-4 sm:p-6 max-w-5xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Rubrics Manager</h2>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-bold">Rubrics Manager</h2>
+            <p className="text-gray-600 text-sm">Keep rubrics aligned to your boards and reuse them across essays.</p>
+          </div>
+          <PageGuide
+            title="How to manage rubrics"
+            ctaLabel="Rubrics guide"
+            summary="Create, import, template, clone, and version."
+            sections={[
+              { title: 'Create or import', body: <p>Fill the form or import a TXT/DOCX. Exam board + template will prefill criteria.</p> },
+              { title: 'Version safely', body: <p>Use “Clone” to iterate; version history is kept via (v1, v2...). Lineage shows related versions.</p> },
+              { title: 'Templates', body: <p>Select a GCSE template to seed AO-aligned criteria. Adjust categories/points as needed.</p> },
+              { title: 'Clean saves', body: <p>Ensure each criterion has a category and max points. Required fields: name, criteria.</p> },
+              { title: 'Shortcuts', body: <p>Ctrl+R opens Rubrics, Ctrl+E jumps to Essay Feedback, Ctrl+H opens History.</p> },
+            ]}
+          />
+        </div>
         {loading ? (
           <div className="space-y-4">
             <FormSkeleton />

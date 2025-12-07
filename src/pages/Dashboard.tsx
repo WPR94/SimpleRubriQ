@@ -10,6 +10,7 @@ import { DashboardSkeleton, ChartSkeleton } from '../components/LoadingSkeleton'
 import { useKeyboardShortcuts, KeyboardShortcutsHelp } from '../hooks/useKeyboardShortcuts';
 import { OnboardingTour, useOnboardingTour } from '../components/OnboardingTour';
 import { useDashboardStats, useFeedbackData } from '../hooks/useDashboard';
+import { PageGuide } from '../components/PageGuide';
 
 function Dashboard() {
   const { user, profile } = useAuth();
@@ -226,6 +227,55 @@ function Dashboard() {
               >
                 {showTour ? 'Skip tour' : 'Replay guided tour'}
               </button>
+              <PageGuide
+                title="Dashboard Guide"
+                summary="Know where to click and why."
+                ctaLabel="Open dashboard guide"
+                sections={[
+                  {
+                    title: 'Stats cards',
+                    body: (
+                      <p>
+                        Quick totals for essays, rubrics, and feedback. Use them to sanity-check that your latest runs
+                        saved correctly.
+                      </p>
+                    ),
+                  },
+                  {
+                    title: 'Charts',
+                    body: (
+                      <p>
+                        Trend and distribution of recent feedback scores. Hover to see values; export deeper data from
+                        the Analytics page when needed.
+                      </p>
+                    ),
+                  },
+                  {
+                    title: 'Insights',
+                    body: (
+                      <p>
+                        Common strengths and pitfalls aggregated from recent feedback. Use this to tailor reteach plans.
+                      </p>
+                    ),
+                  },
+                  {
+                    title: 'Recent feedback',
+                    body: (
+                      <p>
+                        Jump back into the most recent essays. Great for quick follow-ups or exporting a specific run.
+                      </p>
+                    ),
+                  },
+                  {
+                    title: 'Shortcuts',
+                    body: (
+                      <p>
+                        Ctrl+E: new feedback · Ctrl+R: rubrics · Ctrl+H: history · ?: shortcut help. Replay the tour any time.
+                      </p>
+                    ),
+                  },
+                ]}
+              />
             </div>
           </div>
 

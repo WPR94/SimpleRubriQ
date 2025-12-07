@@ -15,8 +15,17 @@ export function useSessionTimeout() {
 
   // Get timeout from localStorage (in minutes)
   const getTimeoutMinutes = () => {
-    const stored = localStorage.getItem('simple-rubriq-session-timeout');
-    return stored ? parseInt(stored) : 120; // Default 120 minutes (2 hours)
+    try {
+      const stored = localStorage.getItem('simple-rubriq-session-timeout');
+      if (!stored) return 120;
+      
+      const parsed = parseInt(stored, 10);
+      if (isNaN(parsed) || parsed < 5) return 120; // Fallback to 120 if invalid or too short
+      
+      return parsed;
+    } catch (e) {
+      return 120;
+    }
   };
 
   const resetTimer = () => {
@@ -28,7 +37,7 @@ export function useSessionTimeout() {
 
     const timeoutMinutes = getTimeoutMinutes();
     const timeoutMs = timeoutMinutes * 60 * 1000;
-    const warningMs = timeoutMs - 60 * 1000; // Warn 1 minute before
+    const warningMs = Math.max(0, timeoutMs - 60 * 1000); // Warn 1 minute before, but ensure non-negative
 
     // Set warning timer (1 minute before logout)
     warningRef.current = setTimeout(() => {
@@ -39,10 +48,22 @@ export function useSessionTimeout() {
 
     // Set logout timer
     timeoutRef.current = setTimeout(async () => {
+      console.log('Session expired. Timeout minutes:', timeoutMinutes);
       notify.error('Session expired due to inactivity. Please sign in again.');
       await signOut();
       navigate('/auth');
     }, timeoutMs);
+  };
+
+  // Throttle resetTimer to avoid excessive re-renders/timer resets
+  const lastResetRef = useRef<number>(0);
+  const throttledReset = () => {
+    const now = Date.now();
+    // Only reset at most once every 5 seconds
+    if (now - lastResetRef.current > 5000) {
+      resetTimer();
+      lastResetRef.current = now;
+    }
   };
 
   useEffect(() => {
@@ -51,8 +72,8 @@ export function useSessionTimeout() {
     // Events that indicate user activity
     const events = ['mousedown', 'keydown', 'scroll', 'touchstart', 'mousemove'];
 
-    // Reset timer on any user activity
-    const handleActivity = () => resetTimer();
+    // Reset timer on any user activity (throttled)
+    const handleActivity = () => throttledReset();
 
     // Initial timer setup
     resetTimer();

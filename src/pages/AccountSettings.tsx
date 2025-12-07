@@ -24,15 +24,17 @@ export default function AccountSettings() {
     setLoading(true);
     try {
       // Use upsert to handle both update and create cases
+      // We specify onConflict: 'user_id' to handle cases where the row exists but might have a different ID (legacy data)
+      // or simply to ensure we match on the unique user_id constraint.
       const { error } = await supabase
         .from('profiles')
         .upsert({ 
           id: user.id,
-          user_id: user.id, // Redundant but required by some schema versions
+          user_id: user.id, 
           email: user.email,
           full_name: fullName, 
           updated_at: new Date().toISOString() 
-        });
+        }, { onConflict: 'user_id' });
 
       if (error) throw error;
       notify.success('Profile updated successfully');

@@ -18,7 +18,15 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_admin boolean DEFAULT FA
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE;
 
--- 1c. Backfill user_id if it's null (it should match id)
+-- 1c. Ensure user_id has a unique constraint (required for ON CONFLICT upserts)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'profiles_user_id_key') THEN
+    ALTER TABLE public.profiles ADD CONSTRAINT profiles_user_id_key UNIQUE (user_id);
+  END IF;
+END $$;
+
+-- 1d. Backfill user_id if it's null (it should match id)
 UPDATE public.profiles SET user_id = id WHERE user_id IS NULL;
 
 -- 2. Enable RLS

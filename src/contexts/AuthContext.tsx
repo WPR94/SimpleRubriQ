@@ -101,13 +101,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // maybeSingle returns null data if no row exists (without error)
         if (!profileData) {
           console.warn('[AuthContext] No profile row found, creating one...');
-          const { error: insertError } = await supabase.from('profiles').insert({
+          // Use upsert with onConflict to avoid race conditions or duplicate key errors
+          const { error: insertError } = await supabase.from('profiles').upsert({
             id: currentUser.id,
-            user_id: currentUser.id, // Redundant but required by some schema versions
+            user_id: currentUser.id,
             email: currentUser.email,
             full_name: (currentUser as any).user_metadata?.full_name || null,
             is_admin: isAdminOverride(currentUser.email) || false
-          });
+          }, { onConflict: 'user_id' });
+          
           if (insertError) {
             console.error('[AuthContext] Failed to create profile row', insertError);
             // Fallback stub profile if override applies

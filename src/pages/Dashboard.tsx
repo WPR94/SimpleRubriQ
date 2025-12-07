@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Navbar from '../components/Navbar';
 import ErrorBoundary from '../components/ErrorBoundary';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { DashboardSkeleton, ChartSkeleton } from '../components/LoadingSkeleton';
 import { useKeyboardShortcuts, KeyboardShortcutsHelp } from '../hooks/useKeyboardShortcuts';
 import { OnboardingTour, useOnboardingTour } from '../components/OnboardingTour';
@@ -251,7 +251,13 @@ function Dashboard() {
                   ) : (feedbackData && feedbackData.length > 0) ? (
                     <div className="w-full overflow-x-auto">
                       <ResponsiveContainer width="100%" height={250} minWidth={300}>
-                        <LineChart data={trendChartData}>
+                        <AreaChart data={trendChartData}>
+                          <defs>
+                            <linearGradient id="colorScoreDashboard" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
+                              <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                            </linearGradient>
+                          </defs>
                           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                           <XAxis
                             dataKey="created_at"
@@ -281,16 +287,18 @@ function Dashboard() {
                             formatter={(value: any) => [`${value}/100`, 'Score']}
                           />
                           <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                          <Line 
+                          <Area 
                             type="monotone" 
                             dataKey="overall_score" 
                             stroke="#3B82F6" 
                             strokeWidth={3} 
+                            fillOpacity={1}
+                            fill="url(#colorScoreDashboard)"
                             name="Score" 
                             dot={{ r: 4, strokeWidth: 2, fill: '#fff' }} 
                             activeDot={{ r: 6, strokeWidth: 0 }}
                           />
-                        </LineChart>
+                        </AreaChart>
                       </ResponsiveContainer>
                     </div>
                   ) : (

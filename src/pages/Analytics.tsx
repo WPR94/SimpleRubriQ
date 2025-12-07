@@ -4,6 +4,8 @@ import { supabase } from '../lib/supabaseClient';
 import {
   LineChart,
   Line,
+  AreaChart,
+  Area,
   BarChart,
   Bar,
   PieChart,
@@ -698,7 +700,13 @@ function Analytics() {
               <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Score Trends (Last 30 Days)</h3>
               <div className="w-full overflow-x-auto">
                 <ResponsiveContainer width="100%" height={300} minWidth={300}>
-                  <LineChart data={trendData}>
+                  <AreaChart data={trendData}>
+                    <defs>
+                      <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                     <XAxis 
                       dataKey="date" 
@@ -723,16 +731,18 @@ function Analytics() {
                       }}
                     />
                     <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                    <Line
+                    <Area
                       type="monotone"
                       dataKey="avgScore"
                       stroke="#8b5cf6"
                       strokeWidth={3}
+                      fillOpacity={1}
+                      fill="url(#colorScore)"
                       name="Average Score"
                       dot={{ r: 4, strokeWidth: 2, fill: '#fff' }}
                       activeDot={{ r: 6, strokeWidth: 0 }}
                     />
-                  </LineChart>
+                  </AreaChart>
                 </ResponsiveContainer>
               </div>
             </div>

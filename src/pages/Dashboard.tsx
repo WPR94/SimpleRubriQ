@@ -25,37 +25,37 @@ function Dashboard() {
   const recentFeedback = statsData?.recentFeedback ?? [];
 
   // Onboarding tour
-  const { showTour, completeTour, skipTour } = useOnboardingTour('simple-rubriq-dashboard-tour');
+  const { showTour, completeTour, skipTour, resetTour } = useOnboardingTour('simple-rubriq-dashboard-tour');
 
   const tourSteps = [
     {
       target: '[data-tour="stats"]',
       title: '👋 Welcome to Simple Rubriq!',
-      content: 'Save hours by grading essays against your own rubrics. Your dashboard gives you an at-a-glance view of all your grading activity—track essays, rubrics, and AI-generated feedback in one place.',
+      content: 'Start here: a snapshot of essays, rubrics, and feedback counts. Use this to confirm your latest grading runs saved correctly.',
       placement: 'bottom' as const,
     },
     {
       target: '[data-tour="essay-feedback"]',
-      title: '✍️ Start Grading Essays',
-      content: 'Click here to upload and grade essays. You can paste text directly, or upload PDF/DOCX files. Our AI will analyze the content and provide detailed feedback based on your rubrics.',
+      title: '✍️ Grade an Essay',
+      content: 'Paste or upload an essay, select a rubric, choose a tone, and generate feedback. Save to log it to history automatically.',
       placement: 'top' as const,
     },
     {
       target: '[data-tour="rubrics"]',
-      title: '📋 Create Custom Rubrics',
-      content: 'Manage your grading criteria here. Upload rubrics from files or create custom scoring categories. Each rubric can be reused across multiple assignments.',
+      title: '📋 Tune Your Rubrics',
+      content: 'Create or edit rubrics so AI feedback matches your criteria. Reuse rubrics across classes to keep grading consistent.',
       placement: 'top' as const,
     },
     {
       target: '[data-tour="students"]',
-      title: '👥 Manage Your Students',
-      content: 'Keep track of your student roster. Import students from CSV files or add them individually. Link essays to students for better organization and tracking.',
+      title: '👥 Organize Students',
+      content: 'Import or add students, then link essays to them for cleaner tracking and reporting.',
       placement: 'top' as const,
     },
     {
       target: '[data-tour="analytics"]',
-      title: '📊 View Insights & Analytics',
-      content: 'See detailed performance trends, score distributions, and export your data to CSV. Track student progress over time and identify areas for improvement.',
+      title: '📊 Spot Trends',
+      content: 'See score trends and distributions. Export to CSV when you need to share or archive results.',
       placement: 'top' as const,
     },
   ];
@@ -221,7 +221,7 @@ function Dashboard() {
               </ul>
               <button
                 type="button"
-                onClick={showTour ? skipTour : completeTour}
+                onClick={() => (showTour ? skipTour() : resetTour())}
                 className="inline-flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
               >
                 {showTour ? 'Skip tour' : 'Replay guided tour'}

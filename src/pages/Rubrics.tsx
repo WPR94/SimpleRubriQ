@@ -60,9 +60,9 @@ function Rubrics() {
     const load = async () => {
       try {
         setLoading(true);
-        // Timeout protection for maintenance/downtime
+        // Timeout protection for maintenance/downtime (increased to 30s for cold starts)
         const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Request timed out - Supabase may be under maintenance')), 20000)
+          setTimeout(() => reject(new Error('Request timed out - Supabase may be under maintenance')), 30000)
         );
         const fetchPromise = supabase
           .from('rubrics')
@@ -83,11 +83,14 @@ function Rubrics() {
         }
       } catch (error: any) {
         if (!mounted) return;
-        console.error('Rubrics load error:', error);
-        // Only notify if it's not a timeout or if we really want to annoy the user
-        // For timeouts, we might just want to show an empty state or a retry button
-        if (error.message !== 'Request timed out - Supabase may be under maintenance') {
-             notify.error(`Failed to load rubrics: ${error.message || 'Unknown error'}`);
+        
+        const isTimeout = error.message === 'Request timed out - Supabase may be under maintenance';
+        
+        if (isTimeout) {
+          console.warn('Rubrics load timed out (likely cold start)');
+        } else {
+          console.error('Rubrics load error:', error);
+          notify.error(`Failed to load rubrics: ${error.message || 'Unknown error'}`);
         }
         setRubrics([]); // Clear to empty state instead of hanging
       } finally {

@@ -48,9 +48,9 @@ function Students() {
   const loadStudents = async (mounted = true) => {
     try {
       setLoading(true);
-      // Timeout protection for maintenance/downtime
+      // Timeout protection for maintenance/downtime (increased to 30s for cold starts)
       const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Request timed out - Supabase may be under maintenance')), 20000)
+        setTimeout(() => reject(new Error('Request timed out - Supabase may be under maintenance')), 30000)
       );
       const fetchPromise = supabase
         .from('students')
@@ -66,8 +66,13 @@ function Students() {
       setStudents(data || []);
     } catch (error: any) {
       if (!mounted) return;
-      console.error('Error loading students:', error);
-      if (error.message !== 'Request timed out - Supabase may be under maintenance') {
+      
+      const isTimeout = error.message === 'Request timed out - Supabase may be under maintenance';
+      
+      if (isTimeout) {
+        console.warn('Students load timed out (likely cold start)');
+      } else {
+        console.error('Error loading students:', error);
         notify.error(`Failed to load students: ${error.message || 'Unknown error'}`);
       }
       setStudents([]); // Clear to empty state instead of hanging

@@ -42,7 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.warn('[AuthContext] Watchdog: forcing loading=false after timeout');
         setLoading(false);
       }
-    }, 20000);
+    }, 30000);
 
     const adminEmailsRaw = (import.meta.env.VITE_ADMIN_EMAILS || '').trim();
     const adminEmailSet = new Set(

@@ -28,6 +28,7 @@ export default function AccountSettings() {
         .from('profiles')
         .upsert({ 
           id: user.id,
+          user_id: user.id, // Redundant but required by some schema versions
           email: user.email,
           full_name: fullName, 
           updated_at: new Date().toISOString() 

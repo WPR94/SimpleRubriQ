@@ -16,6 +16,10 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS full_name text;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS email text;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_admin boolean DEFAULT FALSE;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE;
+
+-- 1c. Backfill user_id if it's null (it should match id)
+UPDATE public.profiles SET user_id = id WHERE user_id IS NULL;
 
 -- 2. Enable RLS
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;

@@ -103,6 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           console.warn('[AuthContext] No profile row found, creating one...');
           const { error: insertError } = await supabase.from('profiles').insert({
             id: currentUser.id,
+            user_id: currentUser.id, // Redundant but required by some schema versions
             email: currentUser.email,
             full_name: (currentUser as any).user_metadata?.full_name || null,
             is_admin: isAdminOverride(currentUser.email) || false

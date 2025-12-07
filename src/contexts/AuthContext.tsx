@@ -160,35 +160,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const init = async () => {
       try {
-        // Bound the initial getSession to 10s (generous for slower networks); onAuthStateChange will reconcile later
-        const { data } = await withTimeout(supabase.auth.getSession(), 10000);
+        // Bound the initial getSession to 30s (generous for slower networks); onAuthStateChange will reconcile later
+        const { data } = await withTimeout(supabase.auth.getSession(), 30000);
         if (!mounted) return;
         const currentUser = data.session?.user ?? null;
-        setUser(currentUser);
-        // Exit loading early, hydrate profile in background
-        if (mounted) setLoading(false);
+        
+        // Only update state if we actually got a session or if we're sure we don't have one
+        // But be careful not to overwrite if onAuthStateChange already ran
         if (currentUser) {
+          setUser(currentUser);
           // Dedupe guard: ensure we only hydrate profile once during init
           if (!profileHydrated) {
             const profileData = await fetchOrCreateProfile(currentUser);
             if (mounted) setProfile(profileData);
             if (mounted) setProfileHydrated(true);
           }
-        } else {
-          setProfile(null);
+        }
+        
+        // Exit loading early
+        if (mounted) {
+          setLoading(false);
+          clearTimeout(loadingWatchdog);
         }
       } catch (e) {
         console.warn('[AuthContext] getSession timed out/failed; proceeding without blocking UI', e);
         if (mounted) {
-          setUser(null);
-          setProfile(null);
+          // Do NOT force user/profile to null here, as onAuthStateChange might have already succeeded
           setLoading(false);
+          clearTimeout(loadingWatchdog);
         }
       }
     };
     init();
 
     const { data: sub } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      // Clear watchdog as soon as we get an auth event
+      clearTimeout(loadingWatchdog);
+      
       const currentUser = session?.user ?? null;
       setUser(currentUser);
       if (currentUser) {

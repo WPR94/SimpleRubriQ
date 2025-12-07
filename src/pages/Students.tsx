@@ -56,7 +56,11 @@ function Students() {
         .from('students')
         .select('*')
         .eq('teacher_id', user!.id)
-        .order('name');
+        .order('name')
+        .then(res => res); // Convert to real Promise to prevent double-execution
+        
+      // Prevent unhandled rejection if this fails after timeout
+      fetchPromise.catch(err => console.warn('Supabase query failed silently after timeout', err));
       
       const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
 

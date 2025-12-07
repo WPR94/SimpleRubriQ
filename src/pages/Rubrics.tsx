@@ -68,7 +68,11 @@ function Rubrics() {
           .from('rubrics')
           .select('id, name, subject, criteria, created_at, exam_board, template_id, version, cloned_from')
           .eq('teacher_id', user.id)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .then(res => res); // Convert to real Promise to prevent double-execution
+          
+        // Prevent unhandled rejection if this fails after timeout
+        fetchPromise.catch(err => console.warn('Supabase query failed silently after timeout', err));
         
         const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
         

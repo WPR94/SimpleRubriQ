@@ -1,4 +1,6 @@
 -- RPC to return dashboard counts and recent feedback in one call
+-- Drop existing version to avoid return type mismatch errors on replace
+drop function if exists public.get_teacher_dashboard(uuid);
 create or replace function public.get_teacher_dashboard(p_teacher_id uuid)
 returns table (essays_count bigint, rubrics_count bigint, feedback_count bigint, recent json)
 language sql

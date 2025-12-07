@@ -77,6 +77,7 @@ export default function Navbar() {
   const publicLinks = [
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
+    { name: 'Pricing', path: '/pricing' },
   ];
 
   const linksToShow = user ? navLinks : publicLinks;

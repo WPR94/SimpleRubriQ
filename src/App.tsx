@@ -17,6 +17,9 @@ const About = lazy(() => import('./pages/About'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const Terms = lazy(() => import('./pages/Terms'));
 const DataProcessingAgreement = lazy(() => import('./pages/DataProcessingAgreement'));
+const PricingPage = lazy(() => import('./pages/Pricing'));
+const CheckoutSuccess = lazy(() => import('./pages/CheckoutSuccess'));
+const CheckoutCancel = lazy(() => import('./pages/CheckoutCancel'));
 import AccountSettings from './pages/AccountSettings';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AdminRoute } from './components/AdminRoute';
@@ -72,6 +75,9 @@ function App() {
         <Route path="/privacy" element={<Suspense fallback={<SuspenseFallback />}><Privacy /></Suspense>} />
         <Route path="/terms" element={<Suspense fallback={<SuspenseFallback />}><Terms /></Suspense>} />
         <Route path="/dpa" element={<Suspense fallback={<SuspenseFallback />}><DataProcessingAgreement /></Suspense>} />
+        <Route path="/pricing" element={<Suspense fallback={<SuspenseFallback />}><PricingPage /></Suspense>} />
+        <Route path="/checkout/success" element={<Suspense fallback={<SuspenseFallback />}><CheckoutSuccess /></Suspense>} />
+        <Route path="/checkout/cancel" element={<Suspense fallback={<SuspenseFallback />}><CheckoutCancel /></Suspense>} />
         {/* Protected Settings */}
         <Route element={<ProtectedRoute />}>
           <Route path="/account" element={<Suspense fallback={<SuspenseFallback />}><AccountSettings /></Suspense>} />

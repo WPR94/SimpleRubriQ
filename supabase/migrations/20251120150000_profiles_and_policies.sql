@@ -27,10 +27,6 @@ BEGIN
   END IF;
 END$$;
 
--- Correct block terminator: separate END and $$; to avoid parser confusion
-END
-$$;
-
 CREATE POLICY "Profiles select own or admins"
   ON public.profiles FOR SELECT
   USING (

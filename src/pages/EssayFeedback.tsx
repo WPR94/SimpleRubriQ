@@ -387,7 +387,8 @@ function EssayFeedback() {
           strengths: aiFeedback.strengths,
           improvements: aiFeedback.improvements,
           suggested_feedback: aiFeedback.suggested_feedback,
-          overall_score: aiFeedback.overall_score,
+          // DB expects an integer; round the human-friendly score
+          overall_score: Math.round(aiFeedback.overall_score),
         }])
         .select('id')
         .single();

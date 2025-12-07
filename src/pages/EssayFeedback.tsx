@@ -96,6 +96,7 @@ function EssayFeedback() {
   const initialLoading = rubricsLoading || studentsLoading;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const feedbackRef = useRef<HTMLDivElement>(null);
+  const scanInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

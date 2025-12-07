@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useRef, ReactNode } from 'react';
 import { supabase } from '../lib/supabaseClient';
 
 interface Profile {
@@ -24,7 +24,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<import('@supabase/supabase-js').User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [profileHydrated, setProfileHydrated] = useState(false);
+  // Use ref to track hydration status across async closures without stale state issues
+  const profileHydratedRef = useRef(false);
 
   useEffect(() => {
     let mounted = true;
@@ -170,10 +171,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (currentUser) {
           setUser(currentUser);
           // Dedupe guard: ensure we only hydrate profile once during init
-          if (!profileHydrated) {
+          if (!profileHydratedRef.current) {
+            profileHydratedRef.current = true; // Mark as hydrating immediately to prevent race
             const profileData = await fetchOrCreateProfile(currentUser);
             if (mounted) setProfile(profileData);
-            if (mounted) setProfileHydrated(true);
           }
         }
         
@@ -200,14 +201,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const currentUser = session?.user ?? null;
       setUser(currentUser);
       if (currentUser) {
-        if (!profileHydrated) {
+        if (!profileHydratedRef.current) {
+          profileHydratedRef.current = true;
           const profileData = await fetchOrCreateProfile(currentUser);
           setProfile(profileData);
-          setProfileHydrated(true);
         }
       } else {
         setProfile(null);
-        setProfileHydrated(false);
+        profileHydratedRef.current = false;
       }
       // Ensure UI never stays blocked waiting on auth events
       setLoading(false);

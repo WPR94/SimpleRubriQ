@@ -15,8 +15,8 @@ const supabase = createClient(
 );
 
 // Config
-const PRICE_ID_EARLY_TEACHER = Deno.env.get("PRICE_ID_EARLY_TEACHER"); // £6.99/month
-const PRICE_ID_TEACHER_PRO_PLUS = Deno.env.get("PRICE_ID_TEACHER_PRO_PLUS"); // £9.99/month
+const PRICE_ID_TEACHER_PRO = Deno.env.get("PRICE_ID_TEACHER_PRO"); // £6.99/month - Simple Rubriq – Teacher Pro
+const PRICE_ID_TEACHER_PRO_PLUS = Deno.env.get("PRICE_ID_TEACHER_PRO_PLUS"); // £12.99/month - Simple Rubriq – Teacher Pro+
 const DEFAULT_ORIGIN = Deno.env.get("DEFAULT_ORIGIN") || "https://yourapp.vercel.app";
 
 function jsonResponse(body: unknown, status = 200) {
@@ -76,7 +76,7 @@ serve(async (req) => {
   let priceId: string | undefined;
   
   if (plan === 'teacher_pro') {
-    priceId = PRICE_ID_EARLY_TEACHER; // Reusing early teacher price ID for Teacher Pro
+    priceId = PRICE_ID_TEACHER_PRO;
   } else if (plan === 'teacher_pro_plus') {
     priceId = PRICE_ID_TEACHER_PRO_PLUS;
   }

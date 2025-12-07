@@ -170,14 +170,14 @@ function Dashboard() {
                 <div>
                   <h3 className="text-lg font-bold mb-1">You're on the Free Plan</h3>
                   <p className="text-indigo-100 text-sm">
-                    5 AI feedback runs/month • 3 rubrics • 10 students
+                    3 AI feedback runs/day • 1 saved rubric • Watermarked reports
                   </p>
                 </div>
                 <Link
                   to="/pricing"
                   className="inline-flex items-center px-5 py-2.5 bg-white text-indigo-600 rounded-lg font-semibold hover:bg-indigo-50 transition shadow-sm"
                 >
-                  ⭐ Upgrade to Pro
+                  ⭐ Upgrade to Pro for £6.99/month
                 </Link>
               </div>
             </div>

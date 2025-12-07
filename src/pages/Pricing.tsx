@@ -87,25 +87,29 @@ const PricingPage = () => {
                 <span className="text-5xl font-extrabold text-gray-900">£0</span>
                 <span className="text-gray-500 ml-2">/forever</span>
               </div>
-              <p className="mt-2 text-sm text-gray-500">Perfect for trying it out</p>
+              <p className="mt-2 text-sm text-gray-500">Experience the app risk-free</p>
             </div>
 
             <ul className="space-y-4 mb-8">
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span className="text-gray-700">5 AI Feedback Runs/month</span>
+                <span className="text-gray-700">3 AI Feedback Runs/day</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span className="text-gray-700">Up to 3 Rubrics</span>
+                <span className="text-gray-700">1 Saved Rubric</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span className="text-gray-700">Up to 10 Students</span>
+                <span className="text-gray-700">Basic Essay Grading</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span className="text-gray-700">Standard AI Model</span>
+                <span className="text-gray-700">Text & Small PDF Uploads</span>
+              </li>
+              <li className="flex items-start gap-3 opacity-60">
+                <CheckIcon />
+                <span className="text-gray-600 text-sm">Watermarked Reports</span>
               </li>
             </ul>
 
@@ -131,36 +135,40 @@ const PricingPage = () => {
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold">Teacher Pro</h3>
               <div className="mt-4">
-                <span className="text-5xl font-extrabold">£9.99</span>
+                <span className="text-5xl font-extrabold">£6.99</span>
                 <span className="opacity-90 ml-2">/month</span>
               </div>
-              <p className="mt-2 text-sm opacity-90">Everything you need</p>
+              <p className="mt-2 text-sm opacity-90">For individual teachers</p>
             </div>
 
             <ul className="space-y-4 mb-8">
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span>Unlimited AI Feedback</span>
+                <span>Unlimited AI Essay Feedback</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span>Unlimited Rubrics & Students</span>
+                <span>Unlimited Saved Rubrics</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span>Advanced AI (GPT-4o)</span>
+                <span>Full OCR Support (PDF/DOCX)</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span>Dashboard & Analytics</span>
+                <span>Feedback History Dashboard</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span>PDF/DOCX Exports</span>
+                <span>Sentence-Level Alignment</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span>Priority Support</span>
+                <span>Professional PDF Reports</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckIcon />
+                <span>Priority Email Support</span>
               </li>
             </ul>
 
@@ -190,10 +198,10 @@ const PricingPage = () => {
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-gray-900">Teacher Pro+</h3>
               <div className="mt-4">
-                <span className="text-5xl font-extrabold text-gray-900">£17.99</span>
+                <span className="text-5xl font-extrabold text-gray-900">£12.99</span>
                 <span className="text-gray-500 ml-2">/month</span>
               </div>
-              <p className="mt-2 text-sm text-gray-500">For power users</p>
+              <p className="mt-2 text-sm text-gray-500">For department leads & tutors</p>
             </div>
 
             <ul className="space-y-4 mb-8">
@@ -203,23 +211,27 @@ const PricingPage = () => {
               </li>
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span className="text-gray-700">Batch Grading (30 essays)</span>
+                <span className="text-gray-700">Class Analytics & Insights</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span className="text-gray-700">LMS Integration</span>
+                <span className="text-gray-700">Batch Grading (30-100 essays)</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span className="text-gray-700">Advanced Analytics</span>
+                <span className="text-gray-700">Rubric Presets & Templates</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span className="text-gray-700">Custom Comment Bank</span>
+                <span className="text-gray-700">CSV/LMS Export Options</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span className="text-gray-700">Early Access Features</span>
+                <span className="text-gray-700">Priority Processing Queue</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckIcon />
+                <span className="text-gray-700">Early Access to Beta Features</span>
               </li>
             </ul>
 
@@ -238,18 +250,14 @@ const PricingPage = () => {
                 'Current Plan ✓'
               ) : (
                 'Upgrade to Pro+'
-              )}
-            </button>
-          </div>
-
           {/* SCHOOLS */}
           <div className="bg-white rounded-2xl shadow-lg p-8 border-2 border-gray-200 hover:border-gray-400 transition-all">
             <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold text-gray-900">Schools</h3>
+              <h3 className="text-2xl font-bold text-gray-900">School Plan</h3>
               <div className="mt-4">
-                <span className="text-3xl font-extrabold text-gray-900">Custom</span>
+                <span className="text-3xl font-extrabold text-gray-900">£350+</span>
               </div>
-              <p className="mt-2 text-sm text-gray-500">Starting from £350/year</p>
+              <p className="mt-2 text-sm text-gray-500">Annual billing • 1-30 teachers</p>
             </div>
 
             <ul className="space-y-4 mb-8">
@@ -259,21 +267,29 @@ const PricingPage = () => {
               </li>
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span className="text-gray-700">Centralized Billing</span>
+                <span className="text-gray-700">Multi-Teacher Access (1-30)</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span className="text-gray-700">Admin Dashboard</span>
+                <span className="text-gray-700">Admin Dashboard & Controls</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span className="text-gray-700">Shared Rubric Library</span>
+                <span className="text-gray-700">Shared Rubric Libraries</span>
               </li>
               <li className="flex items-start gap-3">
                 <CheckIcon />
-                <span className="text-gray-700">Dedicated Support</span>
+                <span className="text-gray-700">Department-Wide Analytics</span>
               </li>
               <li className="flex items-start gap-3">
+                <CheckIcon />
+                <span className="text-gray-700">Data Retention & Compliance</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <CheckIcon />
+                <span className="text-gray-700">Dedicated Support Team</span>
+              </li>
+            </ul> className="flex items-start gap-3">
                 <CheckIcon />
                 <span className="text-gray-700">Compliance & Data Agreements</span>
               </li>

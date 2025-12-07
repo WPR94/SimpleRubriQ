@@ -1000,7 +1000,7 @@ function EssayFeedback() {
                   onClick={handleExportText}
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
                 >
-                  � Export as PDF
+                  📄 Export as PDF
                 </button>
                 <button
                   type="button"
@@ -1010,6 +1010,36 @@ function EssayFeedback() {
                   🖨️ Print
                 </button>
               </div>
+            </div>
+
+            {/* Score and Band Summary */}
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col gap-2">
+                <div className="text-sm text-gray-600">Overall Score</div>
+                <div className="text-3xl font-bold text-gray-900">{Math.round(feedback.overall_score)}%</div>
+                <p className="text-sm text-gray-700">Out of 100 based on rubric and AI assessment.</p>
+              </div>
+              {bandAnalysis?.overall_band && (
+                <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 flex flex-col gap-1">
+                  <div className="text-sm text-indigo-700">GCSE Band</div>
+                  <div className="text-2xl font-bold text-indigo-900">Band {bandAnalysis.overall_band}</div>
+                  <div className="text-sm text-indigo-800">Approx. score: {bandAnalysis.overall_score ?? 'N/A'}%</div>
+                  <p className="text-xs text-indigo-700">Based on AO analysis returned by the model.</p>
+                </div>
+              )}
+              {feedback.criteria_scores && Object.keys(feedback.criteria_scores).length > 0 && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="text-sm text-blue-700 mb-2">Criteria Scores</div>
+                  <div className="space-y-2">
+                    {Object.entries(feedback.criteria_scores).map(([criterion, score]) => (
+                      <div key={criterion} className="flex items-center justify-between text-sm text-blue-900">
+                        <span className="font-medium">{criterion}</span>
+                        <span className="bg-white border border-blue-200 rounded px-2 py-1 text-xs">{Math.round(score)}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
             
             {/* Highlighted Essay View */}

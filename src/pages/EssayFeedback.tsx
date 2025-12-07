@@ -826,7 +826,7 @@ function EssayFeedback() {
               </>
             ) : (
               <>
-                <span>­ƒôä</span>
+                <span>📄</span>
                 <span>Upload File (.txt, .docx)</span>
               </>
             )}
@@ -859,7 +859,7 @@ function EssayFeedback() {
               </>
             ) : (
               <>
-                <span>­ƒô©</span>
+                <span>📷</span>
                 <span>Scan Document (OCR)</span>
               </>
             )}
@@ -879,7 +879,7 @@ function EssayFeedback() {
               <span>Generating AI Feedback...</span>
             </span>
           ) : (
-            <span>Ô£¿ Generate AI Feedback</span>
+            <span>✨ Generate AI Feedback</span>
           )}
         </button>
 

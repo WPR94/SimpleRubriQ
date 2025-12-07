@@ -22,10 +22,10 @@ type FeedbackData = {
 };
 
 // Helper to timeout promises
-const withTimeout = <T>(promise: Promise<T>, ms: number): Promise<T> => {
+const withTimeout = <T>(promiseFactory: () => Promise<T>, ms: number): Promise<T> => {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error('Request timed out')), ms);
-    promise
+    promiseFactory()
       .then((value) => {
         clearTimeout(timer);
         resolve(value);
@@ -88,7 +88,7 @@ async function fetchDashboardStats(userId: string): Promise<{ stats: DashboardSt
     }));
 
     return { stats, recentFeedback };
-  }, 10000)(); // Execute the async wrapper
+  }, 10000); // Execute the async wrapper
 }
 
 async function fetchFeedbackData(userId: string): Promise<FeedbackData[]> {
@@ -102,7 +102,7 @@ async function fetchFeedbackData(userId: string): Promise<FeedbackData[]> {
 
     if (error) throw error;
     return data || [];
-  }, 10000)();
+  }, 10000);
 }
 
 export function useDashboardStats(): UseQueryResult<{ stats: DashboardStats; recentFeedback: RecentFeedback[] }, Error> {

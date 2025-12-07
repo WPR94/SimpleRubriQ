@@ -250,6 +250,10 @@ const PricingPage = () => {
                 'Current Plan ✓'
               ) : (
                 'Upgrade to Pro+'
+              )}
+            </button>
+          </div>
+
           {/* SCHOOLS */}
           <div className="bg-white rounded-2xl shadow-lg p-8 border-2 border-gray-200 hover:border-gray-400 transition-all">
             <div className="text-center mb-6">

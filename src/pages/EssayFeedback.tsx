@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabaseClient'; // for saving essays/feedback
 import notify from '../utils/notify';
 import { parseEssayFile, validateEssay } from '../utils/essayParser';
 import { generateEssayFeedback, generateEssayScore, generateBandAnalysis } from '../utils/openaiClient';
-import { generateFeedbackViaEdgeFunction, generateScoreViaEdgeFunction } from '../utils/openaiEdgeFunction';
+import { generateFeedbackViaEdgeFunction, generateScoreViaEdgeFunction, generateBothViaEdgeFunction } from '../utils/openaiEdgeFunction';
 import { AiFeedback } from '../utils/edgeFunctions';
 import Navbar from '../components/Navbar';
 import ErrorBoundary from '../components/ErrorBoundary';
@@ -17,6 +17,8 @@ import CommentBank from '../components/CommentBank';
 import { useTeacherRubrics, useTeacherStudents } from '../hooks/useTeacherData';
 
 type FeedbackTone = 'encouraging' | 'strict' | 'concise' | 'socratic';
+
+type ExportAudience = 'teacher' | 'student' | 'parent' | 'evidence';
 
 // Helper to create a simple text highlight based on keyword matching
 function highlightEssayText(text: string, feedback: AiFeedback | null): React.ReactNode[] {
@@ -94,6 +96,7 @@ function EssayFeedback() {
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [showCommentBank, setShowCommentBank] = useState(false);
   const [showAoLegend, setShowAoLegend] = useState(false);
+  const [exportAudience, setExportAudience] = useState<ExportAudience>('teacher');
   const initialLoading = rubricsLoading || studentsLoading;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const feedbackRef = useRef<HTMLDivElement>(null);
@@ -229,12 +232,13 @@ function EssayFeedback() {
       
       try {
         // Attempt to use Edge Function (most secure)
-        console.log('📡 Trying Edge Function for feedback generation...');
-        feedbackText = await generateFeedbackViaEdgeFunction(content, rubricCriteria, fullPrompt);
-        score = await generateScoreViaEdgeFunction(content, rubricCriteria);
-        console.log('✅ Using Edge Function - API key safely on server');
+        console.log('­ƒôí Trying Edge Function for feedback generation...');
+        const { feedback: edgeFeedback, score: edgeScore } = await generateBothViaEdgeFunction(content, rubricCriteria, fullPrompt);
+        feedbackText = edgeFeedback;
+        score = edgeScore;
+        console.log('Ô£à Using Edge Function - API key safely on server');
       } catch (edgeFunctionError) {
-        console.warn('⚠️ Edge Function failed, falling back to enhanced client-side OpenAI:', edgeFunctionError);
+        console.warn('ÔÜá´©Å Edge Function failed, falling back to enhanced client-side OpenAI:', edgeFunctionError);
         // Fallback to enhanced client-side OpenAI with GCSE analysis
         feedbackText = await generateEssayFeedback(content, rubricCriteria, examBoard, fullPrompt);
         score = await generateEssayScore(content, rubricCriteria);
@@ -243,12 +247,12 @@ function EssayFeedback() {
         try {
           bandData = await generateBandAnalysis(content, rubricCriteria, examBoard);
           setBandAnalysis(bandData);
-          console.log('✅ GCSE Band Analysis:', bandData);
+          console.log('Ô£à GCSE Band Analysis:', bandData);
         } catch (bandError) {
-          console.warn('⚠️ Band analysis failed (non-critical):', bandError);
+          console.warn('ÔÜá´©Å Band analysis failed (non-critical):', bandError);
         }
         
-        console.log('✅ Using Enhanced Client-side OpenAI API with GCSE analysis');
+        console.log('Ô£à Using Enhanced Client-side OpenAI API with GCSE analysis');
       }
       
       // Parse feedback text into structured format and ignore any trailing JSON blocks
@@ -283,7 +287,7 @@ function EssayFeedback() {
         
         if (strengthsMatch) {
           sections.strengths = strengthsMatch[1]
-            .split(/[\-•*]|\d+\./)
+            .split(/[\-ÔÇó*]|\d+\./)
             .filter(s => s.trim())
             .map(s => s.trim())
             .filter(s => s.length > 0);
@@ -291,7 +295,7 @@ function EssayFeedback() {
         
         if (improvementsMatch) {
           sections.improvements = improvementsMatch[1]
-            .split(/[\-•*]|\d+\./)
+            .split(/[\-ÔÇó*]|\d+\./)
             .filter(s => s.trim())
             .map(s => s.trim())
             .filter(s => s.length > 0);
@@ -299,7 +303,7 @@ function EssayFeedback() {
         
         if (grammarMatch) {
           sections.grammar_issues = grammarMatch[1]
-            .split(/[\-•*]|\d+\./)
+            .split(/[\-ÔÇó*]|\d+\./)
             .filter(s => s.trim())
             .map(s => s.trim())
             .filter(s => s.length > 0);
@@ -336,7 +340,7 @@ function EssayFeedback() {
       setFeedback(aiFeedback);
       
       // Save essay and feedback to database
-      console.log('💾 Saving essay to database...', {
+      console.log('­ƒÆ¥ Saving essay to database...', {
         title,
         word_count: validation.wordCount,
         teacher_id: user.id,
@@ -357,16 +361,16 @@ function EssayFeedback() {
         .select('id')
         .single();
       
-      console.log('💾 Essay save result:', { essayData, essayError });
+      console.log('­ƒÆ¥ Essay save result:', { essayData, essayError });
       
       if (essayError) {
-        console.error('❌ Failed to save essay - Full error:', JSON.stringify(essayError, null, 2));
+        console.error('ÔØî Failed to save essay - Full error:', JSON.stringify(essayError, null, 2));
         notify.error(`Failed to save essay: ${essayError.message || 'Unknown error'}`);
         return;
       }
       
       if (!essayData) {
-        console.error('❌ No essay data returned after insert');
+        console.error('ÔØî No essay data returned after insert');
         notify.error('Feedback generated but failed to save to database');
         return;
       }
@@ -374,7 +378,7 @@ function EssayFeedback() {
       
       // Save feedback to database
       setSavedEssayId(essayData.id);
-      console.log('💾 Saving feedback to database...', {
+      console.log('­ƒÆ¥ Saving feedback to database...', {
         essay_id: essayData.id,
         rubric_id: rubricId,
         overall_score: aiFeedback.overall_score
@@ -394,13 +398,13 @@ function EssayFeedback() {
         .select('id')
         .single();
       
-      console.log('💾 Feedback save result:', { feedbackData, feedbackError });
+      console.log('­ƒÆ¥ Feedback save result:', { feedbackData, feedbackError });
       
       if (feedbackError) {
-        console.error('❌ Failed to save feedback - Full error:', JSON.stringify(feedbackError, null, 2));
+        console.error('ÔØî Failed to save feedback - Full error:', JSON.stringify(feedbackError, null, 2));
         notify.error(`Essay saved but feedback failed to save: ${feedbackError.message || 'Unknown error'}`);
       } else {
-        console.log('✅ Essay and feedback saved successfully!');
+        console.log('Ô£à Essay and feedback saved successfully!');
         notify.success('AI feedback generated and saved successfully!');
         
         // Auto-scroll to feedback section
@@ -409,7 +413,7 @@ function EssayFeedback() {
         }, 100);
       }
     } catch (error) {
-      console.error('❌ Generate error:', error);
+      console.error('ÔØî Generate error:', error);
       const errorMessage = error instanceof Error ? error.message : String(error);
       console.error('Error details:', { errorMessage, fullError: error });
       notify.error(errorMessage || 'Failed to generate feedback');
@@ -431,7 +435,7 @@ function EssayFeedback() {
     notify.success('Ready to grade another essay!');
   };
 
-  const handleExportText = async () => {
+  const handleExportPdf = async (audience: ExportAudience = exportAudience) => {
     if (!feedback) return;
     
     try {
@@ -441,13 +445,15 @@ function EssayFeedback() {
       const margin = 15;
       const maxWidth = pageWidth - margin * 2;
       let yPosition = 20;
-      
-      // Helper to add text with wrapping
-      const addText = (text: string, fontSize = 10, isBold = false) => {
+
+      const brandPrimary = '#1e3a8a';
+      const subtle = '#4b5563';
+
+      const addText = (text: string, fontSize = 10, isBold = false, color = '#111827') => {
         doc.setFontSize(fontSize);
+        doc.setTextColor(color);
         if (isBold) doc.setFont('helvetica', 'bold');
         else doc.setFont('helvetica', 'normal');
-        
         const lines = doc.splitTextToSize(text, maxWidth);
         lines.forEach((line: string) => {
           if (yPosition > 270) {
@@ -455,97 +461,73 @@ function EssayFeedback() {
             yPosition = 20;
           }
           doc.text(line, margin, yPosition);
-          yPosition += fontSize * 0.5;
+          yPosition += fontSize * 0.5 + 1;
         });
-        yPosition += 3;
+        yPosition += 2;
       };
-      
-      // Title
-      addText('ESSAY FEEDBACK REPORT', 16, true);
-      yPosition += 2;
-      addText(`Essay: ${title}`, 12, true);
-      addText(`Date: ${new Date().toLocaleDateString()}`, 10);
-      addText(`Overall Score: ${feedback.overall_score}/100`, 12, true);
-      
-      // Band Analysis in PDF
-      if (bandAnalysis) {
-        addText(`GCSE Band: ${bandAnalysis.overall_band}/6 (${
-          bandAnalysis.overall_band === 6 ? 'Exceptional' :
-          bandAnalysis.overall_band === 5 ? 'Secure' :
-          bandAnalysis.overall_band === 4 ? 'Developing' :
-          bandAnalysis.overall_band === 3 ? 'Emerging' :
-          bandAnalysis.overall_band === 2 ? 'Limited' : 'Basic'
-        })`, 11, true);
-        if (bandAnalysis.justification) {
-          addText(`"${bandAnalysis.justification}"`, 9);
+
+      addText('SimpleRubriQ Feedback', 16, true, brandPrimary);
+      addText(`Essay: ${title || 'Untitled essay'}`, 12, true);
+      addText(`Date: ${new Date().toLocaleDateString()}`, 10, false, subtle);
+      addText(`Audience: ${audience === 'teacher' ? 'Teacher report' : audience === 'student' ? 'Student summary' : audience === 'parent' ? 'Parent summary' : 'Evidence pack'}`, 10, false, subtle);
+      addText(`Overall Score: ${Math.round(feedback.overall_score)} / 100`, 12, true);
+
+      if (audience === 'student' || audience === 'parent') {
+        if (feedback.strengths?.length) {
+          addText(audience === 'student' ? 'What went well' : 'Strengths to celebrate', 12, true, brandPrimary);
+          feedback.strengths.slice(0, 3).forEach((s, i) => addText(`${i + 1}. ${s}`, 10));
+        }
+        if (feedback.improvements?.length) {
+          addText(audience === 'student' ? 'Next steps' : 'How to improve', 12, true, brandPrimary);
+          feedback.improvements.slice(0, 3).forEach((s, i) => addText(`${i + 1}. ${s}`, 10));
+        }
+        if (audience === 'parent' && feedback.suggested_feedback) {
+          addText('Teacher note', 12, true, brandPrimary);
+          addText(feedback.suggested_feedback, 10);
+        }
+      } else {
+        if (bandAnalysis) {
+          addText(`GCSE Band: ${bandAnalysis.overall_band ?? '-'} / 6`, 11, true);
+          if (bandAnalysis.justification) addText(`Why: ${bandAnalysis.justification}`, 10, false, subtle);
+        }
+
+        if (bandAnalysis?.ao_bands?.length) {
+          addText('Assessment Objectives', 12, true, brandPrimary);
+          bandAnalysis.ao_bands.forEach((ao: any) => addText(`${ao.ao}: Band ${ao.band} — ${ao.comment}`, 10));
+        }
+
+        if (feedback.criteria_scores && Object.keys(feedback.criteria_scores).length > 0) {
+          addText('Criteria Scores', 12, true, brandPrimary);
+          Object.entries(feedback.criteria_scores).forEach(([criterion, score]) => addText(`${criterion}: ${Math.round(score as number)}%`, 10));
+        }
+
+        if (feedback.grammar_issues?.length) {
+          addText('Grammar Issues', 12, true, brandPrimary);
+          feedback.grammar_issues.forEach((issue, i) => addText(`${i + 1}. ${issue}`, 10));
+        }
+
+        if (feedback.strengths?.length) {
+          addText('Strengths', 12, true, brandPrimary);
+          feedback.strengths.forEach((strength, i) => addText(`${i + 1}. ${strength}`, 10));
+        }
+
+        if (feedback.improvements?.length) {
+          addText('Areas for Improvement', 12, true, brandPrimary);
+          feedback.improvements.forEach((improvement, i) => addText(`${i + 1}. ${improvement}`, 10));
+        }
+
+        if (feedback.suggested_feedback) {
+          addText('Teacher Summary', 12, true, brandPrimary);
+          addText(feedback.suggested_feedback, 10);
+        }
+
+        if (audience === 'evidence' && content) {
+          addText('Essay Excerpt (context)', 12, true, brandPrimary);
+          addText(content.slice(0, 1200) + (content.length > 1200 ? '...' : ''), 9, false, subtle);
         }
       }
-      yPosition += 5;
-      
-      // Assessment Objectives Analysis
-      if (bandAnalysis?.ao_bands && bandAnalysis.ao_bands.length > 0) {
-        addText('ASSESSMENT OBJECTIVES ANALYSIS', 12, true);
-        bandAnalysis.ao_bands.forEach((ao: any) => {
-          addText(`${ao.ao} - Band ${ao.band}: ${ao.comment}`, 10);
-        });
-        yPosition += 5;
-      }
 
-      // AO Legend (if toggled on)
-      if (showAoLegend) {
-        addText('ASSESSMENT OBJECTIVES GUIDE', 12, true);
-        addText('AO1: Content and Organisation - Identify and interpret information, select evidence, communicate clearly', 9);
-        addText('AO2: Language, Structure and Form - Analyse how writers use language and structure to achieve effects', 9);
-        addText('AO3: Context - Show understanding of relationships between texts and contexts', 9);
-        addText('AO4: SPaG - Use accurate spelling, punctuation, grammar, and varied vocabulary', 9);
-        yPosition += 5;
-      }
-      
-      // Grammar Issues
-      addText('GRAMMAR ISSUES', 12, true);
-      feedback.grammar_issues.forEach((issue, i) => {
-        addText(`${i + 1}. ${issue}`, 10);
-      });
-      yPosition += 5;
-      
-      // Strengths
-      addText('STRENGTHS', 12, true);
-      feedback.strengths.forEach((strength, i) => {
-        addText(`${i + 1}. ${strength}`, 10);
-      });
-      yPosition += 5;
-      
-      // Improvements
-      addText('AREAS FOR IMPROVEMENT', 12, true);
-      feedback.improvements.forEach((improvement, i) => {
-        addText(`${i + 1}. ${improvement}`, 10);
-      });
-      yPosition += 5;
-      
-      // Criteria Matches
-      if (feedback.criteria_matches && feedback.criteria_matches.length > 0) {
-        addText('RUBRIC CRITERIA ANALYSIS', 12, true);
-        feedback.criteria_matches.forEach((match) => {
-          addText(match.criterion, 11, true);
-          match.examples.forEach((example) => {
-            addText(`• ${example}`, 10);
-          });
-          yPosition += 2;
-        });
-        yPosition += 5;
-      }
-      
-      // Suggested Feedback
-      addText('SUGGESTED FEEDBACK SUMMARY', 12, true);
-      addText(feedback.suggested_feedback, 10);
-      yPosition += 5;
-      
-      // Essay Content
-      addText('ESSAY CONTENT', 12, true);
-      addText(content, 9);
-    
-      // Save PDF
-      doc.save(`${title.replace(/[^a-z0-9]/gi, '_')}_feedback.pdf`);
+      doc.save(`${title.replace(/[^a-z0-9]/gi, '_') || 'essay-feedback'}_${audience}.pdf`);
       notify.success('Feedback exported as PDF!');
     } catch (error) {
       console.error('PDF export error:', error);
@@ -598,7 +580,7 @@ function EssayFeedback() {
         pushHeading('Rubric Criteria Analysis');
         feedback.criteria_matches.forEach((m) => {
           paragraphs.push(new docx.Paragraph({ text: m.criterion, heading: docx.HeadingLevel.HEADING_3 }));
-          m.examples.forEach((ex) => pushText(`• ${ex}`));
+          m.examples.forEach((ex) => pushText(`ÔÇó ${ex}`));
         });
       }
 
@@ -629,7 +611,7 @@ function EssayFeedback() {
   // Keyboard shortcuts
   useKeyboardShortcuts([
     { key: 'Enter', ctrl: true, callback: () => handleGenerate(), description: 'Generate AI feedback' },
-    { key: 'p', ctrl: true, shift: true, callback: () => handleExportText(), description: 'Export PDF' },
+    { key: 'p', ctrl: true, shift: true, callback: () => handleExportPdf(), description: 'Export PDF' },
     { key: 'd', ctrl: true, shift: true, callback: () => handleExportDocx(), description: 'Export DOCX' },
     { key: '?', shift: true, callback: () => setShortcutsOpen((v) => !v), description: 'Toggle shortcuts help' },
     { key: 'ArrowUp', ctrl: true, callback: () => {
@@ -834,17 +816,17 @@ function EssayFeedback() {
           >
             {uploading && uploadProgress > 0 ? (
               <>
-                <span className="animate-spin">⚡</span>
+                <span className="animate-spin">ÔÜí</span>
                 <span>Processing ({uploadProgress}%)</span>
               </>
             ) : uploading ? (
               <>
-                <span className="animate-spin">⚡</span>
+                <span className="animate-spin">ÔÜí</span>
                 <span>Uploading...</span>
               </>
             ) : (
               <>
-                <span>📄</span>
+                <span>­ƒôä</span>
                 <span>Upload File (.txt, .docx)</span>
               </>
             )}
@@ -867,17 +849,17 @@ function EssayFeedback() {
           >
             {uploading && uploadProgress > 0 ? (
               <>
-                <span className="animate-spin">📸</span>
+                <span className="animate-spin">­ƒô©</span>
                 <span>Scanning ({uploadProgress}%)</span>
               </>
             ) : uploading ? (
               <>
-                <span className="animate-spin">📸</span>
+                <span className="animate-spin">­ƒô©</span>
                 <span>Processing...</span>
               </>
             ) : (
               <>
-                <span>📸</span>
+                <span>­ƒô©</span>
                 <span>Scan Document (OCR)</span>
               </>
             )}
@@ -893,11 +875,11 @@ function EssayFeedback() {
         >
           {generating ? (
             <span className="flex items-center justify-center gap-2">
-              <span className="animate-spin">⚡</span>
+              <span className="animate-spin">ÔÜí</span>
               <span>Generating AI Feedback...</span>
             </span>
           ) : (
-            <span>✨ Generate AI Feedback</span>
+            <span>Ô£¿ Generate AI Feedback</span>
           )}
         </button>
 
@@ -908,7 +890,7 @@ function EssayFeedback() {
             onClick={() => setShowAoLegend(v => !v)}
             className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium"
           >
-            <span>{showAoLegend ? '▼' : '▶'}</span>
+            <span>{showAoLegend ? 'Ôû╝' : 'ÔûÂ'}</span>
             <span>Assessment Objectives (AO) Guide</span>
           </button>
           
@@ -917,30 +899,30 @@ function EssayFeedback() {
               <div>
                 <h4 className="font-semibold text-blue-900 mb-1">AO1: Content and Organisation</h4>
                 <p className="text-sm text-blue-800">
-                  • Identify and interpret explicit and implicit information and ideas<br />
-                  • Select and synthesise evidence from different texts<br />
-                  • Communicate clearly, effectively and imaginatively
+                  ÔÇó Identify and interpret explicit and implicit information and ideas<br />
+                  ÔÇó Select and synthesise evidence from different texts<br />
+                  ÔÇó Communicate clearly, effectively and imaginatively
                 </p>
               </div>
               <div>
                 <h4 className="font-semibold text-blue-900 mb-1">AO2: Language, Structure and Form</h4>
                 <p className="text-sm text-blue-800">
-                  • Explain and analyse how writers use language and structure to achieve effects<br />
-                  • Use relevant subject terminology to support your views
+                  ÔÇó Explain and analyse how writers use language and structure to achieve effects<br />
+                  ÔÇó Use relevant subject terminology to support your views
                 </p>
               </div>
               <div>
                 <h4 className="font-semibold text-blue-900 mb-1">AO3: Context</h4>
                 <p className="text-sm text-blue-800">
-                  • Show understanding of relationships between texts and contexts<br />
-                  • Consider how context influences meaning
+                  ÔÇó Show understanding of relationships between texts and contexts<br />
+                  ÔÇó Consider how context influences meaning
                 </p>
               </div>
               <div>
                 <h4 className="font-semibold text-blue-900 mb-1">AO4: SPaG (Spelling, Punctuation and Grammar)</h4>
                 <p className="text-sm text-blue-800">
-                  • Use a range of vocabulary and sentence structures<br />
-                  • Use accurate spelling, punctuation and grammar
+                  ÔÇó Use a range of vocabulary and sentence structures<br />
+                  ÔÇó Use accurate spelling, punctuation and grammar
                 </p>
               </div>
             </div>
@@ -960,7 +942,7 @@ function EssayFeedback() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-green-900">✅ Feedback Generated & Saved!</h3>
+                    <h3 className="text-xl font-bold text-green-900">Ô£à Feedback Generated & Saved!</h3>
                     <p className="text-green-700 text-sm mt-1">Your feedback is ready and has been saved to your history.</p>
                   </div>
                 </div>
@@ -971,57 +953,70 @@ function EssayFeedback() {
                   onClick={handleDone}
                   className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold flex items-center gap-2"
                 >
-                  <span>✨</span>
+                  <span>Ô£¿</span>
                   <span>Grade Another Essay</span>
                 </button>
                 <Link
                   to="/feedback-history"
                   className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center gap-2"
                 >
-                  <span>📋</span>
+                  <span>­ƒôï</span>
                   <span>View All Feedback</span>
                 </Link>
                 <Link
                   to="/dashboard"
                   className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-semibold flex items-center gap-2"
                 >
-                  <span>🏠</span>
+                  <span>­ƒÅá</span>
                   <span>Go to Dashboard</span>
                 </Link>
               </div>
             </div>
             
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
               <h3 className="text-2xl font-bold text-gray-900">AI Feedback Results</h3>
-              <div className="flex gap-3">
+              <div className="flex gap-3 flex-wrap items-center justify-end">
                 {savedEssayId && (
                   <Link
                     to="/feedback-history"
                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                   >
-                    📋 View in History
+                    ­ƒôï View in History
                   </Link>
                 )}
+                <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                  <span className="text-gray-700 font-medium">Audience</span>
+                  <select
+                    value={exportAudience}
+                    onChange={(e) => setExportAudience(e.target.value as ExportAudience)}
+                    className="border border-gray-300 rounded px-2 py-1 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  >
+                    <option value="teacher">Teacher</option>
+                    <option value="student">Student</option>
+                    <option value="parent">Parent</option>
+                    <option value="evidence">Evidence</option>
+                  </select>
+                </div>
                 <button
                   type="button"
                   onClick={handleExportDocx}
                   className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium"
                 >
-                  📄 Export as DOCX
+                  ­ƒôä Export as DOCX
                 </button>
                 <button
                   type="button"
-                  onClick={handleExportText}
+                  onClick={() => handleExportPdf(exportAudience)}
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
                 >
-                  📄 Export as PDF
+                  ­ƒôä Export as PDF
                 </button>
                 <button
                   type="button"
                   onClick={handlePrint}
                   className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
                 >
-                  🖨️ Print
+                  ­ƒû¿´©Å Print
                 </button>
               </div>
             </div>
@@ -1119,7 +1114,7 @@ function EssayFeedback() {
                     <span>100</span>
                   </div>
                 </div>
-              </div>
+              </div
               
               {/* GCSE Band Analysis */}
               {bandAnalysis && (
@@ -1241,7 +1236,7 @@ function EssayFeedback() {
             { keys: 'Ctrl+Enter', description: 'Generate AI feedback' },
             { keys: 'Ctrl+Shift+P', description: 'Export PDF' },
             { keys: 'Ctrl+Shift+D', description: 'Export DOCX' },
-            { keys: 'Ctrl+↑/↓', description: 'Adjust score ±1' },
+            { keys: 'Ctrl+Ôåæ/Ôåô', description: 'Adjust score ┬▒1' },
             { keys: 'Shift+?', description: 'Toggle this help' },
           ]}
         />
@@ -1254,3 +1249,4 @@ function EssayFeedback() {
 }
 
 export default EssayFeedback;
+

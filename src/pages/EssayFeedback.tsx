@@ -250,8 +250,25 @@ function EssayFeedback() {
         console.log('✅ Using Enhanced Client-side OpenAI API with GCSE analysis');
       }
       
-      // Parse feedback text into structured format
+      // Parse feedback text into structured format and ignore any trailing JSON blocks
       const parseFeedbackText = (text: string) => {
+        // Capture optional fenced JSON (e.g., AO scores) so we can store without breaking parsing
+        const jsonBlock = text.match(/```json\s*([\s\S]*?)```/i);
+        let criteriaScores: Record<string, number> | undefined;
+        if (jsonBlock?.[1]) {
+          try {
+            const parsedJson = JSON.parse(jsonBlock[1]);
+            if (parsedJson && typeof parsedJson === 'object') {
+              criteriaScores = parsedJson as Record<string, number>;
+            }
+          } catch {
+            // Ignore bad JSON from the model
+          }
+        }
+
+        // Remove the JSON block from the main text for cleaner section parsing
+        const sanitized = text.replace(/```json[\s\S]*?```/gi, '');
+
         const sections = {
           strengths: [] as string[],
           improvements: [] as string[],
@@ -259,9 +276,9 @@ function EssayFeedback() {
         };
         
         // Split into main sections - look for common patterns
-        const strengthsMatch = text.match(/Strengths:(.*?)(?=Areas for Improvement:|$)/is);
-        const improvementsMatch = text.match(/Areas for Improvement:(.*?)(?=Action Steps:|Suggested Feedback:|$)/is);
-        const grammarMatch = text.match(/grammar issues?:(.*?)(?=Strengths:|Areas for Improvement:|$)/is);
+        const strengthsMatch = sanitized.match(/Strengths:(.*?)(?=Areas for Improvement:|$)/is);
+        const improvementsMatch = sanitized.match(/Areas for Improvement:(.*?)(?=Action Steps:|Suggested Feedback:|$)/is);
+        const grammarMatch = sanitized.match(/grammar issues?:(.*?)(?=Strengths:|Areas for Improvement:|$)/is);
         
         if (strengthsMatch) {
           sections.strengths = strengthsMatch[1]
@@ -287,18 +304,20 @@ function EssayFeedback() {
             .filter(s => s.length > 0);
         }
         
-        return sections;
+        const cleanedFeedback = sanitized.trim();
+        return { sections, criteriaScores, cleanedFeedback };
       };
       
-      const parsed = parseFeedbackText(feedbackText);
+      const { sections: parsedSections, criteriaScores, cleanedFeedback } = parseFeedbackText(feedbackText);
       
       const aiFeedback: AiFeedback = {
         overall_score: Math.min(100, Math.max(0, score)),
-        grammar_issues: parsed.grammar_issues.length > 0 ? parsed.grammar_issues : ['No significant grammar issues found'],
-        strengths: parsed.strengths.length > 0 ? parsed.strengths : ['Well-structured and coherent essay'],
-        improvements: parsed.improvements.length > 0 ? parsed.improvements : ['Continue to develop and refine writing skills'],
-        suggested_feedback: feedbackText,
+        grammar_issues: parsedSections.grammar_issues.length > 0 ? parsedSections.grammar_issues : ['No significant grammar issues found'],
+        strengths: parsedSections.strengths.length > 0 ? parsedSections.strengths : ['Well-structured and coherent essay'],
+        improvements: parsedSections.improvements.length > 0 ? parsedSections.improvements : ['Continue to develop and refine writing skills'],
+        suggested_feedback: cleanedFeedback || feedbackText,
         criteria_matches: [],
+        ...(criteriaScores ? { criteria_scores: criteriaScores } : {}),
       };
       
       setFeedback(aiFeedback);

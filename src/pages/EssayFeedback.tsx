@@ -309,9 +309,21 @@ function EssayFeedback() {
       };
       
       const { sections: parsedSections, criteriaScores, cleanedFeedback } = parseFeedbackText(feedbackText);
+
+      // Derive a more human-feeling score: prefer explicit criteria/AO scores if present, otherwise fall back to model score
+      const computeHumanScore = () => {
+        if (criteriaScores && Object.keys(criteriaScores).length > 0) {
+          const values = Object.values(criteriaScores).map(Number).filter(v => !Number.isNaN(v));
+          if (values.length) return values.reduce((a, b) => a + b, 0) / values.length;
+        }
+        if (bandAnalysis?.overall_score) return bandAnalysis.overall_score;
+        return score;
+      };
+
+      const humanScore = Math.min(100, Math.max(0, computeHumanScore()));
       
       const aiFeedback: AiFeedback = {
-        overall_score: Math.min(100, Math.max(0, score)),
+        overall_score: humanScore,
         grammar_issues: parsedSections.grammar_issues.length > 0 ? parsedSections.grammar_issues : ['No significant grammar issues found'],
         strengths: parsedSections.strengths.length > 0 ? parsedSections.strengths : ['Well-structured and coherent essay'],
         improvements: parsedSections.improvements.length > 0 ? parsedSections.improvements : ['Continue to develop and refine writing skills'],

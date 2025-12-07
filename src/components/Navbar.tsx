@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { usePlan } from '../hooks/usePlan';
 import Logo from './Logo';
 import { 
   Bars3Icon, 
@@ -11,12 +12,23 @@ import {
 
 export default function Navbar() {
   const { user, signOut, profile } = useAuth();
+  const { plan, isLoading } = usePlan();
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const prefetched = useRef<Set<string>>(new Set());
+
+  const getPlanBadge = () => {
+    if (isLoading) return null;
+    if (plan === 'teacher_pro') return { text: 'Pro', color: 'bg-indigo-600' };
+    if (plan === 'teacher_pro_plus') return { text: 'Pro+', color: 'bg-purple-600' };
+    if (plan === 'school') return { text: 'School', color: 'bg-green-600' };
+    return { text: 'Free', color: 'bg-gray-500' };
+  };
+
+  const planBadge = getPlanBadge();
 
   const routePrefetchers: Record<string, () => Promise<unknown>> = {
     '/dashboard': () => import('../pages/Dashboard'),
@@ -136,7 +148,21 @@ export default function Navbar() {
                       <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-600">
                         <p className="text-xs text-gray-500 dark:text-gray-400">Signed in as</p>
                         <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{user?.email}</p>
+                        {planBadge && (
+                          <span className={`inline-flex items-center mt-1 px-2 py-0.5 rounded text-xs font-medium text-white ${planBadge.color}`}>
+                            {planBadge.text}
+                          </span>
+                        )}
                       </div>
+                      {plan === 'free' && (
+                        <Link
+                          to="/pricing"
+                          className="block px-4 py-2 text-sm text-indigo-600 dark:text-indigo-400 hover:bg-gray-100 dark:hover:bg-gray-600 font-semibold"
+                          onClick={() => setIsProfileOpen(false)}
+                        >
+                          ⭐ Upgrade to Pro
+                        </Link>
+                      )}
                       <Link
                         to="/account"
                         className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"

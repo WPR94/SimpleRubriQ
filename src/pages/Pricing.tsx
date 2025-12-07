@@ -1,8 +1,17 @@
 import Navbar from '../components/Navbar';
 import { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 const PricingPage = () => {
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get('redirect');
+
   useEffect(() => {
+    // Store redirect URL for after payment
+    if (redirect) {
+      sessionStorage.setItem('post_payment_redirect', redirect);
+    }
+
     // Load Stripe pricing table script
     const script = document.createElement('script');
     script.src = 'https://js.stripe.com/v3/pricing-table.js';
@@ -12,7 +21,7 @@ const PricingPage = () => {
     return () => {
       document.body.removeChild(script);
     };
-  }, []);
+  }, [redirect]);
 
   return (
     <div className="bg-gray-50 min-h-screen">

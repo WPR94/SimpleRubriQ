@@ -6,9 +6,16 @@ const CheckoutSuccess = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Get redirect URL from session storage
+    const redirectUrl = sessionStorage.getItem('post_payment_redirect');
+    const targetUrl = redirectUrl || '/dashboard';
+    
+    // Clear the stored redirect
+    sessionStorage.removeItem('post_payment_redirect');
+
     const timer = setTimeout(() => {
-      navigate('/dashboard');
-    }, 5000);
+      navigate(targetUrl);
+    }, 3000);
     return () => clearTimeout(timer);
   }, [navigate]);
 
@@ -27,7 +34,7 @@ const CheckoutSuccess = () => {
             Your subscription is now active. You have full access to all Pro features.
           </p>
           <p className="mt-2 text-sm text-gray-500">
-            Redirecting to your dashboard in 5 seconds...
+            Redirecting you back in 3 seconds...
           </p>
           <button
             onClick={() => navigate('/dashboard')}

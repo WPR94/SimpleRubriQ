@@ -585,14 +585,38 @@ function Analytics() {
             <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md overflow-hidden">
               <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Grade Distribution</h3>
               <div className="w-full overflow-x-auto">
-                <ResponsiveContainer width="100%" height={window.innerWidth < 768 ? 350 : 300} minWidth={320}>
-                  <BarChart data={gradeDistributionData as any} margin={{ top: 5, right: 10, left: -20, bottom: window.innerWidth < 768 ? 50 : 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="range" angle={window.innerWidth < 768 ? -45 : 0} textAnchor={window.innerWidth < 768 ? 'end' : 'middle'} height={window.innerWidth < 768 ? 80 : 30} />
-                    <YAxis width={window.innerWidth < 768 ? 40 : 60} />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="count" fill="#8b5cf6" name="Number of Essays" />
+                <ResponsiveContainer width="100%" height={300} minWidth={320}>
+                  <BarChart data={gradeDistributionData as any}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                    <XAxis 
+                      dataKey="range" 
+                      tick={{ fill: '#6B7280', fontSize: 12 }}
+                      axisLine={false}
+                      tickLine={false}
+                      dy={10}
+                    />
+                    <YAxis 
+                      tick={{ fill: '#6B7280', fontSize: 12 }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip 
+                      cursor={{ fill: '#F3F4F6' }}
+                      contentStyle={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        borderRadius: '0.5rem',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        border: 'none',
+                        padding: '8px 12px'
+                      }}
+                    />
+                    <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                    <Bar 
+                      dataKey="count" 
+                      fill="#8b5cf6" 
+                      name="Number of Essays" 
+                      radius={[4, 4, 0, 0]} 
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

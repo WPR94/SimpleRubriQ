@@ -8,6 +8,7 @@ import ErrorBoundary from '../components/ErrorBoundary';
 import { ListItemSkeleton } from '../components/LoadingSkeleton';
 import ConfirmModal from '../components/ConfirmModal';
 import { sendFeedbackEmail } from '../utils/emailTemplate';
+import { PageGuide } from '../components/PageGuide';
 
 interface FeedbackItem {
   id: string;
@@ -285,9 +286,42 @@ function FeedbackHistory() {
       />
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Feedback History</h2>
-            <p className="text-gray-600">View and manage all graded essays and their AI feedback</p>
+          <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Feedback History</h2>
+              <p className="text-gray-600">View and manage all graded essays and their AI feedback</p>
+            </div>
+            <PageGuide
+              title="How to use History"
+              ctaLabel="Page guide"
+              summary="Search, filter, review, email, or delete past feedback quickly."
+              sections={[
+                {
+                  title: 'Find items fast',
+                  body: (
+                    <p>Search by essay title or feedback text, then sort by date or score. Toggle advanced filters for score range, date, and student.</p>
+                  ),
+                },
+                {
+                  title: 'Select a card',
+                  body: (
+                    <p>Pick any feedback card on the left to load full details, student name, and generated notes on the right.</p>
+                  ),
+                },
+                {
+                  title: 'Share or clean up',
+                  body: (
+                    <p>Use the send button to email a student (mock email here) or the delete action to remove a record.</p>
+                  ),
+                },
+                {
+                  title: 'Reset filters',
+                  body: (
+                    <p>If results disappear, clear filters to show all saved feedback again.</p>
+                  ),
+                },
+              ]}
+            />
           </div>
 
           {/* Search and Filter Bar */}

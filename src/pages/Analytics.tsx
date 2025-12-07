@@ -22,6 +22,7 @@ import notify from '../utils/notify';
 import Navbar from '../components/Navbar';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { exportToCSV } from '../utils/csvExport';
+import { PageGuide } from '../components/PageGuide';
 
 interface FeedbackData {
   id: string;
@@ -393,25 +394,61 @@ function Analytics() {
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Analytics Dashboard</h2>
               <p className="text-sm sm:text-base text-gray-600 mt-1">Track performance and trends across your graded essays</p>
             </div>
-            <button
-              onClick={handleExportCSV}
-              className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
-            >
-              <svg
-                className="w-4 h-4 sm:w-5 sm:h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            <div className="flex items-center gap-3">
+              <PageGuide
+                title="How to use Analytics"
+                ctaLabel="Page guide"
+                summary="See trends, outliers, and export your recent feedback data."
+                sections={[
+                  {
+                    title: 'Data scope',
+                    body: (
+                      <>
+                        <p>Uses your last 500 feedback records joined to essays and students to populate cards and charts.</p>
+                        <p className="text-gray-500">If you see “No data yet”, grade an essay first.</p>
+                      </>
+                    ),
+                  },
+                  {
+                    title: 'Key metrics cards',
+                    body: (
+                      <p>Essays graded, time saved, averages, median, and score spread update live as feedback is added.</p>
+                    ),
+                  },
+                  {
+                    title: 'Charts & drilldowns',
+                    body: (
+                      <p>Hover to read exact values. Grade distribution, trends, rubrics, and student performance highlight risk and improvement.</p>
+                    ),
+                  },
+                  {
+                    title: 'Export & share',
+                    body: (
+                      <p>Use Export CSV to download the currently loaded dataset for reports or spreadsheets.</p>
+                    ),
+                  },
+                ]}
+              />
+              <button
+                onClick={handleExportCSV}
+                className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-              Export CSV
-            </button>
+                <svg
+                  className="w-4 h-4 sm:w-5 sm:h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
+                </svg>
+                Export CSV
+              </button>
+            </div>
           </div>
 
           {/* Key Metrics */}

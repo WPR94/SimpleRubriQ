@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import notify from '../utils/notify';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { CardSkeleton } from '../components/LoadingSkeleton';
+import { PageGuide } from '../components/PageGuide';
 
 interface RubricLite { id: string; name: string; }
 interface EssayLite { id: string; title: string; content: string; rubric_id: string | null; }
@@ -141,7 +142,32 @@ function Calibration() {
     <ErrorBoundary>
       <Navbar />
       <div className="p-4 max-w-6xl mx-auto">
-        <h2 className="text-2xl font-bold mb-6">Calibration / Moderation</h2>
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+          <h2 className="text-2xl font-bold">Calibration / Moderation</h2>
+          <PageGuide
+            title="How to run Calibration"
+            ctaLabel="Page guide"
+            summary="Align marking across your team with a shared rubric and sample essays."
+            sections={[
+              {
+                title: 'Prep content',
+                body: <p>Add a rubric and upload a handful of representative essays first.</p>,
+              },
+              {
+                title: 'Create a session',
+                body: <p>Name the session, pick the rubric, and select up to 10 essays before creating.</p>,
+              },
+              {
+                title: 'Mark together',
+                body: <p>Open an essay, enter AO scores, and submit marks; repeat for each essay.</p>,
+              },
+              {
+                title: 'Review agreement',
+                body: <p>Use the stats section to spot variance across AO1–AO4 and discuss outliers.</p>,
+              },
+            ]}
+          />
+        </div>
         {initialLoading && (
           <div className="grid sm:grid-cols-2 gap-4 mb-6">
             <CardSkeleton />

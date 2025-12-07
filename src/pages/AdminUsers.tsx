@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { AdminNav } from '../components/AdminNav';
 import ErrorBoundary from '../components/ErrorBoundary';
+import { PageGuide } from '../components/PageGuide';
 import { 
   MagnifyingGlassIcon, 
   UserCircleIcon,
@@ -141,7 +142,7 @@ export function AdminUsers() {
       )}>
       <div className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               User Management
@@ -150,13 +151,38 @@ export function AdminUsers() {
               Manage teacher accounts and permissions
             </p>
           </div>
-          <button
-            onClick={() => exportUsersToCSV(users)}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-          >
-            <ArrowDownTrayIcon className="h-5 w-5" />
-            Export CSV
-          </button>
+          <div className="flex items-center gap-3">
+            <PageGuide
+              title="How to use User Management"
+              ctaLabel="Page guide"
+              summary="Search, paginate, export, and toggle admin access for teachers."
+              sections={[
+                {
+                  title: 'Search & paging',
+                  body: <p>Search by email/name; adjust page size (25/50/100) and navigate with Previous/Next.</p>,
+                },
+                {
+                  title: 'Usage snapshots',
+                  body: <p>Cards show totals; table lists essays, rubrics, and students per teacher.</p>,
+                },
+                {
+                  title: 'Admin toggle',
+                  body: <p>Use Make Admin / Revoke Admin to change privileges, then refresh auto-updates the list.</p>,
+                },
+                {
+                  title: 'Export CSV',
+                  body: <p>Download the current dataset for audits or backups.</p>,
+                },
+              ]}
+            />
+            <button
+              onClick={() => exportUsersToCSV(users)}
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              <ArrowDownTrayIcon className="h-5 w-5" />
+              Export CSV
+            </button>
+          </div>
         </div>
 
         {/* Stats Summary */}

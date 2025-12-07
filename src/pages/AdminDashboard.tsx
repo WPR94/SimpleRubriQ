@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient';
 import { Link } from 'react-router-dom';
 import { AdminNav } from '../components/AdminNav';
 import ErrorBoundary from '../components/ErrorBoundary';
+import { PageGuide } from '../components/PageGuide';
 import { 
   UserGroupIcon, 
   DocumentTextIcon, 
@@ -105,13 +106,38 @@ export function AdminDashboard() {
       <div className="py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Admin Dashboard
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Platform overview and management
-          </p>
+        <div className="mb-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Admin Dashboard
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              Platform overview and management
+            </p>
+          </div>
+          <PageGuide
+            title="How to use Admin Dashboard"
+            ctaLabel="Page guide"
+            summary="Scan platform health, usage, and jump to admin tools."
+            sections={[
+              {
+                title: 'Read the stats cards',
+                body: <p>Total users, essays, rubrics, and recent activity volumes update from admin views.</p>,
+              },
+              {
+                title: 'Quick actions',
+                body: <p>Use Manage Users, Platform Analytics, and Activity Logs tiles to drill deeper.</p>,
+              },
+              {
+                title: 'Costs and health',
+                body: <p>Watch estimated API spend and system health indicators for early warning.</p>,
+              },
+              {
+                title: 'Recent essays',
+                body: <p>Scan the recent essay table to spot spikes or anomalies by teacher.</p>,
+              },
+            ]}
+          />
         </div>
 
         {/* Stats Grid */}

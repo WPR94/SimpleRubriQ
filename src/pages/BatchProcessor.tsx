@@ -6,6 +6,7 @@ import { parseEssayFile } from '../utils/essayParser';
 import { generateAiFeedback } from '../utils/edgeFunctions';
 import JSZip from 'jszip';
 import Navbar from '../components/Navbar';
+import { PageGuide } from '../components/PageGuide';
 
 interface BatchEssay {
   id: string;
@@ -361,9 +362,34 @@ function BatchProcessor() {
     <>
       <Navbar />
       <div className="p-6 max-w-7xl mx-auto">
-        <div className="mb-6">
-          <h2 className="text-3xl font-bold text-gray-900">Batch Essay Processor</h2>
-          <p className="text-gray-600 mt-1">Grade multiple essays at once with AI-powered feedback</p>
+        <div className="mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900">Batch Essay Processor</h2>
+            <p className="text-gray-600 mt-1">Grade multiple essays at once with AI-powered feedback</p>
+          </div>
+          <PageGuide
+            title="How to use Batch Processing"
+            ctaLabel="Page guide"
+            summary="Upload a set of essays, apply one rubric, and export results."
+            sections={[
+              {
+                title: 'Upload essays',
+                body: <p>Add .txt/.docx/.pdf files or a ZIP. Use student names in filenames for auto-matching.</p>,
+              },
+              {
+                title: 'Select rubric & options',
+                body: <p>Choose one rubric for all essays. Toggle AI pre-mark and student auto-match as needed.</p>,
+              },
+              {
+                title: 'Run and monitor',
+                body: <p>Start Processing to grade pending essays. Pause/resume as needed; progress and statuses update live.</p>,
+              },
+              {
+                title: 'Review & export',
+                body: <p>When finished, view scores/feedback and export results for sharing.</p>,
+              },
+            ]}
+          />
         </div>
 
         {/* Upload Section */}

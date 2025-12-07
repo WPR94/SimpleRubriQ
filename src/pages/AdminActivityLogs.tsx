@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { getAllActivityLogs, getActivityStats } from '../utils/activityLogger';
 import { AdminNav } from '../components/AdminNav';
 import ErrorBoundary from '../components/ErrorBoundary';
+import { PageGuide } from '../components/PageGuide';
 import { 
   ClockIcon, 
   UserIcon,
@@ -98,7 +99,7 @@ export function AdminActivityLogs() {
       <div className="py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               Activity Logs
@@ -107,7 +108,30 @@ export function AdminActivityLogs() {
               Audit trail of all user actions (Last 30 days)
             </p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            <PageGuide
+              title="How to use Activity Logs"
+              ctaLabel="Page guide"
+              summary="Filter, export, and audit recent user actions."
+              sections={[
+                {
+                  title: 'Filter quickly',
+                  body: <p>Use the action filter and result limit to narrow to specific events or time windows.</p>,
+                },
+                {
+                  title: 'Badge legend',
+                  body: <p>Colours map to actions (logins, essay submissions, rubric creation, etc.).</p>,
+                },
+                {
+                  title: 'Export & refresh',
+                  body: <p>Export CSV for audits or monitoring; hit Refresh to pull the latest 30-day snapshot.</p>,
+                },
+                {
+                  title: 'Inspect details',
+                  body: <p>Expand rows to read structured action details for troubleshooting.</p>,
+                },
+              ]}
+            />
             <button
               onClick={() => exportActivityLogsToCSV(filteredLogs)}
               className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"

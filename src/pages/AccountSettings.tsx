@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabaseClient';
 import ConfirmModal from '../components/ConfirmModal';
 import Navbar from '../components/Navbar';
 import { notify } from '../utils/notify';
+import { PageGuide } from '../components/PageGuide';
 
 export default function AccountSettings() {
   const { user, profile, signOut, refreshProfile } = useAuth();
@@ -143,9 +144,38 @@ export default function AccountSettings() {
             </svg>
             Back to Dashboard
           </button>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Account Settings
-          </h1>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Account Settings
+            </h1>
+            <PageGuide
+              title="How to use Account Settings"
+              ctaLabel="Page guide"
+              summary="Update profile info, session timeout, exports, and account deletion in one place."
+              sections={[
+                {
+                  title: 'Profile details',
+                  body: <p>Update your name and refresh the profile; email is read-only.</p>,
+                },
+                {
+                  title: 'Session timeout',
+                  body: <p>Pick an inactivity limit to auto-sign-out on shared devices.</p>,
+                },
+                {
+                  title: 'Export your data',
+                  body: <p>Download students, rubrics, essays, and feedback as a JSON bundle for portability.</p>,
+                },
+                {
+                  title: 'Delete account',
+                  body: <p>Deletes all essays, rubrics, students, and your profile; this cannot be undone.</p>,
+                },
+                {
+                  title: 'Preferences',
+                  body: <p>Toggle notification/updates consent (stored locally for now).</p>,
+                },
+              ]}
+            />
+          </div>
         </div>
 
       {/* Account Information */}

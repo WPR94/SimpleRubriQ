@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { AdminNav } from '../components/AdminNav';
 import ErrorBoundary from '../components/ErrorBoundary';
+import { PageGuide } from '../components/PageGuide';
 import {
   LineChart,
   Line,
@@ -125,6 +126,31 @@ export function AdminAnalytics() {
             <p className="text-gray-600 dark:text-gray-400 mt-2">
               Usage trends and growth metrics (Last 30 days)
             </p>
+          </div>
+          <div className="mb-8">
+            <PageGuide
+              title="How to use Platform Analytics"
+              ctaLabel="Page guide"
+              summary="30-day admin view of user growth and essay volume."
+              sections={[
+                {
+                  title: 'Data window',
+                  body: <p>Charts pull the last 30 days of profiles created and essays submitted.</p>,
+                },
+                {
+                  title: 'User growth chart',
+                  body: <p>Hover to read daily signups; legend toggles series if you need to focus.</p>,
+                },
+                {
+                  title: 'Essay activity chart',
+                  body: <p>Bars show daily essay counts; useful to spot peaks or outages.</p>,
+                },
+                {
+                  title: 'Refresh cadence',
+                  body: <p>Data loads on page open; refresh the page after major imports or backfills.</p>,
+                },
+              ]}
+            />
           </div>
 
         {/* User Growth Chart */}

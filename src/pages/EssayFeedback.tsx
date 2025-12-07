@@ -64,7 +64,7 @@ function highlightEssayText(text: string, feedback: AiFeedback | null): React.Re
         </span>
       );
     } else if (hasStrength && sentence.trim().length > 10) {
-              <div className="flex flex-wrap gap-3 items-center">
+      return (
         <span key={idx} className="bg-green-100 border-b-2 border-green-400 px-1" title="Strength">
           {sentence}
         </span>
@@ -74,53 +74,6 @@ function highlightEssayText(text: string, feedback: AiFeedback | null): React.Re
     return <span key={idx}>{sentence}</span>;
   });
 }
-                <PageGuide
-                  title="How to use Essay Feedback"
-                  ctaLabel="Page guide"
-                  summary="Fast path to reliable feedback and saving results."
-                  sections={[
-                    {
-                      title: '1) Add content',
-                      body: (
-                        <>
-                          <p>Paste text or upload PDF/DOCX/TXT. Give it a clear title.</p>
-                          <p className="text-gray-500">Tip: Use the scan option to OCR images/PDFs.</p>
-                        </>
-                      ),
-                    },
-                    {
-                      title: '2) Pick rubric & tone',
-                      body: (
-                        <>
-                          <p>Select a rubric, choose a tone (encouraging/strict/concise/socratic), and add any teacher instructions.</p>
-                          <p className="text-gray-500">Better rubric alignment = better AI output.</p>
-                        </>
-                      ),
-                    },
-                    {
-                      title: '3) Generate & review',
-                      body: (
-                        <>
-                          <p>AI runs first via edge (secure), then falls back to client if needed. Review strengths, improvements, grammar notes, and AO scores.</p>
-                          <p className="text-gray-500">We now surface AO/criteria scores when the model provides them.</p>
-                        </>
-                      ),
-                    },
-                    {
-                      title: '4) Save & export',
-                      body: (
-                        <>
-                          <p>Saving logs the essay and feedback to history. Export to DOCX/PDF or print for sharing.</p>
-                          <p className="text-gray-500">Saved items appear in Dashboard and History instantly.</p>
-                        </>
-                      ),
-                    },
-                    {
-                      title: 'Keyboard shortcuts',
-                      body: <p>Ctrl+E opens Essay Feedback, Ctrl+H opens History, Ctrl+R opens Rubrics.</p>,
-                    },
-                  ]}
-                />
 
 function EssayFeedback() {
   const { user } = useAuth();

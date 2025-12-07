@@ -1114,7 +1114,7 @@ function EssayFeedback() {
                     <span>100</span>
                   </div>
                 </div>
-              </div
+              </div>
               
               {/* GCSE Band Analysis */}
               {bandAnalysis && (

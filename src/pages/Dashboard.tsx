@@ -458,9 +458,12 @@ function Dashboard() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" data-tour="analytics">
                   {/* Common Pitfalls */}
                   <div className="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <span className="text-2xl">⚠️</span> Common Pitfalls
-                    </h3>
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <span className="text-2xl">⚠️</span> Common Pitfalls
+                      </h3>
+                      <span className="text-xs text-gray-500">Top recurring issues (count shows affected students)</span>
+                    </div>
                     {classInsights.commonPitfalls.length > 0 ? (
                       <ul className="space-y-3">
                         {classInsights.commonPitfalls.map((item, idx) => (
@@ -479,9 +482,12 @@ function Dashboard() {
 
                   {/* Class Strengths */}
                   <div className="bg-white rounded-lg shadow p-6 border-l-4 border-green-500">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                      <span className="text-2xl">💪</span> Class Strengths
-                    </h3>
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                        <span className="text-2xl">💪</span> Class Strengths
+                      </h3>
+                      <span className="text-xs text-gray-500">Wins to reinforce (count shows how many students)</span>
+                    </div>
                     {classInsights.commonStrengths.length > 0 ? (
                       <ul className="space-y-3">
                         {classInsights.commonStrengths.map((item, idx) => (

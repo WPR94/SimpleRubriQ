@@ -55,6 +55,8 @@ function Rubrics() {
 
   useEffect(() => {
     if (!user) return;
+    let mounted = true;
+
     const load = async () => {
       try {
         setLoading(true);
@@ -70,6 +72,8 @@ function Rubrics() {
         
         const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
         
+        if (!mounted) return;
+
         if (error) {
           console.error(error);
           notify.error('Failed to load rubrics');
@@ -78,14 +82,20 @@ function Rubrics() {
           setRubrics(data as RubricRow[]);
         }
       } catch (error: any) {
+        if (!mounted) return;
         console.error('Rubrics load error:', error);
-        notify.error(`Failed to load rubrics: ${error.message || 'Unknown error'}`);
+        // Only notify if it's not a timeout or if we really want to annoy the user
+        // For timeouts, we might just want to show an empty state or a retry button
+        if (error.message !== 'Request timed out - Supabase may be under maintenance') {
+             notify.error(`Failed to load rubrics: ${error.message || 'Unknown error'}`);
+        }
         setRubrics([]); // Clear to empty state instead of hanging
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
     load();
+    return () => { mounted = false; };
   }, [user]);
 
   const handleCriterionChange = (idx: number, field: keyof Criterion, value: string | number) => {

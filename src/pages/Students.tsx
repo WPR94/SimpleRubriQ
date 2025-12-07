@@ -38,12 +38,14 @@ function Students() {
   const csvInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    let mounted = true;
     if (user?.id) {
-      loadStudents();
+      loadStudents(mounted);
     }
+    return () => { mounted = false; };
   }, [user]);
 
-  const loadStudents = async () => {
+  const loadStudents = async (mounted = true) => {
     try {
       setLoading(true);
       // Timeout protection for maintenance/downtime
@@ -58,14 +60,19 @@ function Students() {
       
       const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
 
+      if (!mounted) return;
+
       if (error) throw error;
       setStudents(data || []);
     } catch (error: any) {
+      if (!mounted) return;
       console.error('Error loading students:', error);
-      notify.error(`Failed to load students: ${error.message || 'Unknown error'}`);
+      if (error.message !== 'Request timed out - Supabase may be under maintenance') {
+        notify.error(`Failed to load students: ${error.message || 'Unknown error'}`);
+      }
       setStudents([]); // Clear to empty state instead of hanging
     } finally {
-      setLoading(false);
+      if (mounted) setLoading(false);
     }
   };
 

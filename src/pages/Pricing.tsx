@@ -293,10 +293,6 @@ const PricingPage = () => {
                 <CheckIcon />
                 <span className="text-gray-700">Dedicated Support Team</span>
               </li>
-            </ul> className="flex items-start gap-3">
-                <CheckIcon />
-                <span className="text-gray-700">Compliance & Data Agreements</span>
-              </li>
             </ul>
 
             <a

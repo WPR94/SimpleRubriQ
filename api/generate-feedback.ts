@@ -85,19 +85,27 @@ ${rubricCriteria}
 📝 ESSAY:
 ${essayText}
 
-💬 Provide:
-1. 2-3 specific strengths with quotes
-2. 2-3 development areas with examples
-3. Grammar/SPaG issues if significant
-4. Natural summary (300-400 words max)
-5. A JSON object named "criteria_scores" mapping rubric categories to scores (0-100)
+💬 Provide feedback in this format:
+
+Strengths:
+- [specific strength with quote]
+- [another strength]
+
+Areas for Improvement:
+- [specific area with example]
+- [another area]
+
+Grammar Issues:
+- [issues if any, or "No significant grammar issues"]
+
+Suggested Feedback:
+[natural, encouraging summary as if speaking to the student directly]
 
 Be specific. Quote their work. Sound like a real teacher, not a robot.`,
         },
       ],
       temperature: 0.85,
       max_tokens: 1000,
-      response_format: { type: "json_object" } // Force JSON output for easier parsing
     });
 
     const content = response.choices[0]?.message?.content;
@@ -105,13 +113,10 @@ Be specific. Quote their work. Sound like a real teacher, not a robot.`,
       throw new Error('No feedback generated');
     }
     
-    // Parse the JSON response
-    const parsedContent = JSON.parse(content);
-    
-    // Add diagnostics header (non-sensitive)
+    // Return the feedback as plain text (no JSON parsing needed)
     const key = process.env.OPENAI_API_KEY || '';
     res.setHeader('X-Diagnostics', `openaiKeyPresent=${!!key};keyStart=${key.slice(0,8)}`);
-    return res.status(200).json({ feedback: parsedContent });
+    return res.status(200).json({ feedback: content });
   } catch (error: any) {
     console.error('OpenAI API Error:', error);
     

@@ -599,46 +599,72 @@ function Analytics() {
             </div>
 
             {/* Score Breakdown */}
-            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md overflow-hidden">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md overflow-hidden flex flex-col">
               <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Score Breakdown</h3>
-              {window.innerWidth < 768 ? (
-                <div className="space-y-4">
-                  <div className="bg-gray-50 rounded-lg p-4 grid grid-cols-2 gap-3">
-                    {gradeDistribution.map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-2">
-                        <div 
-                          className={`w-4 h-4 rounded-full flex-shrink-0 ${COLOR_CLASSES[idx % COLOR_CLASSES.length]}`}
+              <div className="w-full h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={gradeDistributionData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={100}
+                      paddingAngle={2}
+                      dataKey="count"
+                      nameKey="range"
+                      label={({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+                        const RADIAN = Math.PI / 180;
+                        const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+                        const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                        const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                        
+                        return percent > 0.05 ? (
+                          <text 
+                            x={x} 
+                            y={y} 
+                            fill="white" 
+                            textAnchor="middle" 
+                            dominantBaseline="central"
+                            className="text-xs font-bold"
+                            style={{ fontSize: '12px', fontWeight: 'bold', pointerEvents: 'none' }}
+                          >
+                            {`${(percent * 100).toFixed(0)}%`}
+                          </text>
+                        ) : null;
+                      }}
+                      labelLine={false}
+                    >
+                      {gradeDistribution.map((_entry, index) => (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={COLORS[index % COLORS.length]} 
+                          stroke="#fff"
+                          strokeWidth={2}
                         />
-                        <div>
-                          <p className="text-xs text-gray-600 font-medium">{item.range}</p>
-                          <p className="text-sm font-bold text-gray-900">{item.count}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="w-full overflow-x-auto">
-                  <ResponsiveContainer width="100%" height={300} minWidth={300}>
-                    <PieChart>
-                      <Pie
-                        data={gradeDistributionData as any}
-                        dataKey="count"
-                        nameKey="range"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={100}
-                        label={(entry) => `${entry.range}: ${entry.count}`}
-                      >
-                        {gradeDistribution.map((_entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip formatter={(value) => `${value} essays`} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+                        borderRadius: '0.5rem', 
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        border: 'none'
+                      }}
+                      formatter={(value: number, name: string) => [
+                        <span className="font-bold text-gray-900">{value} essays</span>, 
+                        <span className="text-gray-600">{name}</span>
+                      ]}
+                    />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={36} 
+                      iconType="circle"
+                      formatter={(value) => <span className="text-sm text-gray-600 ml-1">{value}</span>}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </div>
 

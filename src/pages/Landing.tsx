@@ -166,6 +166,70 @@ function Landing() {
               </p>
             </div>
           </div>
+
+          {/* Social Proof Section */}
+          <div className="mt-20 px-4">
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl font-bold mb-2">Trusted by Educators</h3>
+                <p className="text-blue-100">Join thousands of teachers saving hours every week</p>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="text-center">
+                  <div className="text-4xl font-bold mb-2">10,000+</div>
+                  <div className="text-blue-100">Essays Graded</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl font-bold mb-2">500+</div>
+                  <div className="text-blue-100">Active Teachers</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-4xl font-bold mb-2">95%</div>
+                  <div className="text-blue-100">Satisfaction Rate</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Testimonials */}
+          <div className="mt-12 px-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                <div className="flex items-center mb-4">
+                  <div className="flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                      </svg>
+                    ))}
+                  </div>
+                </div>
+                <p className="text-blue-100 mb-4 italic">
+                  "Simple Rubriq has transformed how I grade essays. What used to take me 3 hours now takes 20 minutes. The feedback is detailed and consistent."
+                </p>
+                <p className="font-semibold">Sarah M.</p>
+                <p className="text-blue-200 text-sm">English Teacher, London</p>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                <div className="flex items-center mb-4">
+                  <div className="flex text-yellow-400">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                        <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                      </svg>
+                    ))}
+                  </div>
+                </div>
+                <p className="text-blue-100 mb-4 italic">
+                  "The custom rubrics feature is brilliant. I can grade exactly to my marking criteria, and the AI never gets tired or inconsistent."
+                </p>
+                <p className="font-semibold">James T.</p>
+                <p className="text-blue-200 text-sm">History Teacher, Manchester</p>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
 

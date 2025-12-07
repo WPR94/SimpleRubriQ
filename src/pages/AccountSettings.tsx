@@ -11,6 +11,7 @@ export default function AccountSettings() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [fullName, setFullName] = useState(profile?.full_name || '');
+  const [successMessage, setSuccessMessage] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [sessionTimeout, setSessionTimeout] = useState(() => {
     return localStorage.getItem('simple-rubriq-session-timeout') || '30';
@@ -38,6 +39,8 @@ export default function AccountSettings() {
 
       if (error) throw error;
       notify.success('Profile updated successfully');
+      setSuccessMessage('Profile updated successfully!');
+      setTimeout(() => setSuccessMessage(''), 3000);
       await refreshProfile(); 
     } catch (error: any) {
       console.error('Profile update error:', error);
@@ -169,6 +172,14 @@ export default function AccountSettings() {
                 {loading ? 'Saving...' : 'Save'}
               </button>
             </div>
+            {successMessage && (
+              <p className="mt-2 text-sm text-green-600 dark:text-green-400 flex items-center">
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                {successMessage}
+              </p>
+            )}
           </div>
           <div>
             <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Email</label>

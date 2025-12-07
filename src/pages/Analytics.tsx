@@ -675,17 +675,38 @@ function Analytics() {
               <div className="w-full overflow-x-auto">
                 <ResponsiveContainer width="100%" height={300} minWidth={300}>
                   <LineChart data={trendData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis domain={[0, 100]} />
-                    <Tooltip />
-                    <Legend />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                    <XAxis 
+                      dataKey="date" 
+                      tick={{ fill: '#6B7280', fontSize: 12 }}
+                      axisLine={false}
+                      tickLine={false}
+                      dy={10}
+                    />
+                    <YAxis 
+                      domain={[0, 100]} 
+                      tick={{ fill: '#6B7280', fontSize: 12 }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        borderRadius: '0.5rem',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        border: 'none',
+                        padding: '8px 12px'
+                      }}
+                    />
+                    <Legend wrapperStyle={{ paddingTop: '20px' }} />
                     <Line
                       type="monotone"
                       dataKey="avgScore"
                       stroke="#8b5cf6"
-                      strokeWidth={2}
+                      strokeWidth={3}
                       name="Average Score"
+                      dot={{ r: 4, strokeWidth: 2, fill: '#fff' }}
+                      activeDot={{ r: 6, strokeWidth: 0 }}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -700,12 +721,40 @@ function Analytics() {
               <div className="w-full overflow-x-auto">
                 <ResponsiveContainer width="100%" height={300} minWidth={400}>
                   <BarChart data={rubricPerformance} layout="vertical" margin={{ left: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                    <XAxis type="number" domain={[0, 100]} />
-                    <YAxis dataKey="name" type="category" width={150} tick={{ fontSize: 12 }} />
-                    <Tooltip cursor={{ fill: 'transparent' }} />
-                    <Legend />
-                    <Bar dataKey="avgScore" fill="#10b981" name="Average Score" radius={[0, 4, 4, 0]} barSize={20} />
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
+                    <XAxis 
+                      type="number" 
+                      domain={[0, 100]} 
+                      tick={{ fill: '#6B7280', fontSize: 12 }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis 
+                      dataKey="name" 
+                      type="category" 
+                      width={150} 
+                      tick={{ fill: '#6B7280', fontSize: 12 }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip 
+                      cursor={{ fill: '#F3F4F6' }}
+                      contentStyle={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        borderRadius: '0.5rem',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        border: 'none',
+                        padding: '8px 12px'
+                      }}
+                    />
+                    <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                    <Bar 
+                      dataKey="avgScore" 
+                      fill="#10b981" 
+                      name="Average Score" 
+                      radius={[0, 4, 4, 0]} 
+                      barSize={20} 
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

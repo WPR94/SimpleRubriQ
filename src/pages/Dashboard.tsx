@@ -252,19 +252,44 @@ function Dashboard() {
                     <div className="w-full overflow-x-auto">
                       <ResponsiveContainer width="100%" height={250} minWidth={300}>
                         <LineChart data={trendChartData}>
-                          <CartesianGrid strokeDasharray="3 3" />
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                           <XAxis
                             dataKey="created_at"
                             tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                             fontSize={12}
+                            tick={{ fill: '#6B7280' }}
+                            axisLine={false}
+                            tickLine={false}
+                            dy={10}
                           />
-                          <YAxis domain={[0, 100]} fontSize={12} />
+                          <YAxis 
+                            domain={[0, 100]} 
+                            fontSize={12} 
+                            tick={{ fill: '#6B7280' }}
+                            axisLine={false}
+                            tickLine={false}
+                          />
                           <Tooltip
+                            contentStyle={{
+                              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                              borderRadius: '0.5rem',
+                              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                              border: 'none',
+                              padding: '8px 12px'
+                            }}
                             labelFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                             formatter={(value: any) => [`${value}/100`, 'Score']}
                           />
-                          <Legend />
-                          <Line type="monotone" dataKey="overall_score" stroke="#3B82F6" strokeWidth={2} name="Score" dot={{ r: 4 }} />
+                          <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                          <Line 
+                            type="monotone" 
+                            dataKey="overall_score" 
+                            stroke="#3B82F6" 
+                            strokeWidth={3} 
+                            name="Score" 
+                            dot={{ r: 4, strokeWidth: 2, fill: '#fff' }} 
+                            activeDot={{ r: 6, strokeWidth: 0 }}
+                          />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
@@ -282,12 +307,38 @@ function Dashboard() {
                     <div className="w-full overflow-x-auto">
                       <ResponsiveContainer width="100%" height={250} minWidth={300}>
                         <BarChart data={scoreDistributionData}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="range" fontSize={12} />
-                          <YAxis fontSize={12} />
-                          <Tooltip />
-                          <Legend />
-                          <Bar dataKey="count" fill="#10B981" name="Essays" />
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                          <XAxis 
+                            dataKey="range" 
+                            fontSize={12} 
+                            tick={{ fill: '#6B7280' }}
+                            axisLine={false}
+                            tickLine={false}
+                            dy={10}
+                          />
+                          <YAxis 
+                            fontSize={12} 
+                            tick={{ fill: '#6B7280' }}
+                            axisLine={false}
+                            tickLine={false}
+                          />
+                          <Tooltip 
+                            cursor={{ fill: '#F3F4F6' }}
+                            contentStyle={{
+                              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                              borderRadius: '0.5rem',
+                              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                              border: 'none',
+                              padding: '8px 12px'
+                            }}
+                          />
+                          <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                          <Bar 
+                            dataKey="count" 
+                            fill="#10B981" 
+                            name="Essays" 
+                            radius={[4, 4, 0, 0]}
+                          />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>

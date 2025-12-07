@@ -49,10 +49,10 @@ export default function AccountSettings() {
     setLoading(true);
     try {
       // Fetch all user data
-      const [studentsRes, rubricsRes, feedbackRes] = await Promise.all([
-        supabase.from('students').select('*').eq('user_id', user?.id),
-        supabase.from('rubrics').select('*').eq('user_id', user?.id),
-        supabase.from('essay_feedback').select('*').eq('user_id', user?.id),
+      const [studentsRes, rubricsRes, essaysRes] = await Promise.all([
+        supabase.from('students').select('*').eq('teacher_id', user?.id),
+        supabase.from('rubrics').select('*').eq('teacher_id', user?.id),
+        supabase.from('essays').select('*, feedback(*)').eq('teacher_id', user?.id),
       ]);
 
       const exportData = {
@@ -64,7 +64,7 @@ export default function AccountSettings() {
         },
         students: studentsRes.data || [],
         rubrics: rubricsRes.data || [],
-        feedback: feedbackRes.data || [],
+        essays: essaysRes.data || [], // Includes feedback nested
       };
 
       // Create downloadable JSON file
@@ -92,10 +92,11 @@ export default function AccountSettings() {
     setLoading(true);
     try {
       // Delete all related data (cascade delete via foreign keys)
+      // Note: Deleting essays will cascade to feedback
       await Promise.all([
-        supabase.from('essay_feedback').delete().eq('user_id', user?.id),
-        supabase.from('rubrics').delete().eq('user_id', user?.id),
-        supabase.from('students').delete().eq('user_id', user?.id),
+        supabase.from('essays').delete().eq('teacher_id', user?.id),
+        supabase.from('rubrics').delete().eq('teacher_id', user?.id),
+        supabase.from('students').delete().eq('teacher_id', user?.id),
       ]);
 
       // Delete user account

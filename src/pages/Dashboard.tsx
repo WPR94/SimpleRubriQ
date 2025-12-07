@@ -182,6 +182,53 @@ function Dashboard() {
             </div>
           </div>
 
+          {/* Quickstart & How-To */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+            <div className="lg:col-span-2 bg-white border border-gray-200 rounded-xl shadow p-5 flex flex-col gap-3">
+              <div className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                <span>🚀 Quickstart</span>
+                <span className="text-gray-400">(best flow to use the app)</span>
+              </div>
+              <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700">
+                <li>Upload or paste an essay in <Link to="/essay-feedback" className="text-blue-600 hover:underline">Essay Feedback</Link>, pick a rubric, and generate feedback.</li>
+                <li>Review AI feedback, adjust as needed, then save—it auto-logs in your history.</li>
+                <li>Track scores and trends here on the dashboard; jump to <Link to="/analytics" className="text-blue-600 hover:underline">Analytics</Link> for deeper insights.</li>
+                <li>Keep rubrics fresh in <Link to="/rubrics" className="text-blue-600 hover:underline">Rubrics</Link> and manage students in <Link to="/students" className="text-blue-600 hover:underline">Students</Link> for clean records.</li>
+              </ol>
+              <div className="flex flex-wrap gap-2 text-xs text-gray-600">
+                <span className="inline-flex items-center gap-1 bg-gray-100 rounded-full px-2 py-1">⌨️ Ctrl + E to open Essay Feedback</span>
+                <span className="inline-flex items-center gap-1 bg-gray-100 rounded-full px-2 py-1">⌨️ Ctrl + R manage Rubrics</span>
+                <span className="inline-flex items-center gap-1 bg-gray-100 rounded-full px-2 py-1">⌨️ Ctrl + H feedback history</span>
+                <button
+                  type="button"
+                  onClick={() => setShowShortcuts(true)}
+                  className="text-blue-600 hover:underline"
+                  title="Open keyboard shortcuts"
+                >
+                  See all shortcuts
+                </button>
+              </div>
+            </div>
+            <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-5 flex flex-col gap-3">
+              <div className="flex items-center gap-2 text-sm font-semibold text-indigo-900">
+                <span>🧭 How this page is organized</span>
+              </div>
+              <ul className="space-y-2 text-sm text-indigo-900">
+                <li><strong>Stats</strong>: Totals for essays, rubrics, and feedback.</li>
+                <li><strong>Charts</strong>: Trends and score distribution from recent feedback.</li>
+                <li><strong>Insights</strong>: Common strengths/pitfalls across classes.</li>
+                <li><strong>Recent feedback</strong>: Jump back into the latest essays.</li>
+              </ul>
+              <button
+                type="button"
+                onClick={showTour ? skipTour : completeTour}
+                className="inline-flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+              >
+                {showTour ? 'Skip tour' : 'Replay guided tour'}
+              </button>
+            </div>
+          </div>
+
           {statsLoading ? (
             <DashboardSkeleton />
           ) : statsError ? (

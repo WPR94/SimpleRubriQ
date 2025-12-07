@@ -1,6 +1,9 @@
 -- Create a consolidated dashboard function to improve performance and reduce network requests
 -- Run this in the Supabase SQL Editor
 
+-- Drop the existing function first to allow return type changes
+DROP FUNCTION IF EXISTS get_teacher_dashboard(uuid);
+
 CREATE OR REPLACE FUNCTION get_teacher_dashboard(p_teacher_id uuid)
 RETURNS TABLE (
   essays_count bigint,
